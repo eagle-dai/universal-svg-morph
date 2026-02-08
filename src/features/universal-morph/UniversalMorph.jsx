@@ -834,7 +834,7 @@ export default function UniversalMorph({ onBack }) {
         </div>
 
         {/* 右侧：舞台 */}
-        <div className="lg:w-[500px] flex flex-col items-center sticky top-24 h-fit">
+        <div className="lg:w-[560px] flex flex-col items-center sticky top-24 h-fit">
           {/* 添加 ref 到 container 以便 Timeline 控制 */}
           <div
             ref={containerRef}
