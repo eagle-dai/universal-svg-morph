@@ -115,7 +115,6 @@ export const buildAnimatedPathD = (fromPoints, toPoints, t, step = 1) => {
 export const createMorphEngine = ({ duration = 2000 } = {}) => {
   const registry = new Map();
   let animation = null;
-  let frameCount = 0;
 
   const register = (item) => {
     const id = Symbol("morph-item");
@@ -134,12 +133,7 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     });
   };
 
-  const play = ({
-    shouldThrottle = false,
-    motionSampleStep = 1,
-    onComplete,
-  } = {}) => {
-    frameCount = 0;
+  const play = ({ motionSampleStep = 1, onComplete } = {}) => {
     if (animation) {
       animation.pause();
       animation = null;
@@ -154,9 +148,6 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
       duration: duration,
       ease: linear,
       onUpdate: () => {
-        frameCount += 1;
-        if (shouldThrottle && frameCount % 2 !== 0) return;
-
         // 读取当前进度
         const t = Math.min(progress.value, 1);
 
