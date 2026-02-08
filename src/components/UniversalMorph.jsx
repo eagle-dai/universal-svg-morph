@@ -290,6 +290,7 @@ export default function UniversalMorph() {
   const [endKey, setEndKey] = useState('grid225'); 
   const [isPlaying, setIsPlaying] = useState(false);
   const [optimize, setOptimize] = useState(true);
+  const [perfThrottle, setPerfThrottle] = useState(true);
   
   const progressRef = useRef(0);
   const registryRef = useRef(new Map());
@@ -322,13 +323,17 @@ export default function UniversalMorph() {
     let startTime;
     let reqId;
     const duration = 2000; 
+    const shouldThrottle = perfThrottle && isMassive;
+    frameCountRef.current = 0;
 
     const animate = (time) => {
       if (!startTime) startTime = time;
       
-      // FPS Throttling (可选，目前注释掉以追求流畅度)
       frameCountRef.current++;
-      // if (isMassive && frameCountRef.current % 2 !== 0) { ... }
+      if (shouldThrottle && frameCountRef.current % 2 !== 0) {
+        reqId = requestAnimationFrame(animate);
+        return;
+      }
 
       const elapsed = time - startTime;
       const t = Math.min(elapsed / duration, 1);
@@ -364,7 +369,7 @@ export default function UniversalMorph() {
 
     reqId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(reqId);
-  }, [isPlaying, isMassive]);
+  }, [isPlaying, isMassive, perfThrottle]);
 
   const handleReset = (resetToFinal = false) => {
     const t = resetToFinal ? 1 : 0;
@@ -441,6 +446,18 @@ export default function UniversalMorph() {
           >
             <Settings2 size={14} />
             {optimize ? "智能对齐: ON" : "智能对齐: OFF"}
+          </button>
+
+          <button 
+            onClick={() => { setPerfThrottle(!perfThrottle); handleReset(false); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border ${
+              perfThrottle
+                ? 'bg-blue-500/10 border-blue-500/50 text-blue-400'
+                : 'bg-slate-800 border-slate-700 text-slate-500'
+            }`}
+          >
+            <Gauge size={14} />
+            {perfThrottle ? "性能节流: ON" : "性能节流: OFF"}
           </button>
           
           <button 
@@ -551,7 +568,7 @@ export default function UniversalMorph() {
               <h4 className="text-xs font-bold text-slate-400 mb-3 flex items-center gap-2">
                   <Cpu size={12}/> V6 全员聚合统计
               </h4>
-              <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="grid grid-cols-4 gap-2 text-center">
                   <div className="bg-slate-950 rounded p-2">
                       <div className="text-[10px] text-slate-500">活跃元素</div>
                       <div className="text-sm font-mono text-emerald-400">{maxPaths}</div>
@@ -563,6 +580,12 @@ export default function UniversalMorph() {
                   <div className="bg-slate-950 rounded p-2">
                       <div className="text-[10px] text-slate-500">采样精度</div>
                       <div className="text-sm font-mono text-purple-400">{staticSamples}点</div>
+                  </div>
+                  <div className="bg-slate-950 rounded p-2">
+                      <div className="text-[10px] text-slate-500">性能提示</div>
+                      <div className={`text-[11px] font-mono ${perfThrottle && isMassive ? 'text-emerald-400' : 'text-slate-400'}`}>
+                        {perfThrottle && isMassive ? "半帧节流" : "全帧渲染"}
+                      </div>
                   </div>
               </div>
           </div>
