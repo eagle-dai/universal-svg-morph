@@ -216,6 +216,7 @@ export default function UniversalMorph({ onBack }) {
   const [optimize, setOptimize] = useState(true);
   
   const engineRef = useRef(null);
+  const animationStopRef = useRef(null);
   if (!engineRef.current) {
     engineRef.current = createMorphEngine({ duration: 2000 });
   }
@@ -239,30 +240,29 @@ export default function UniversalMorph({ onBack }) {
   const motionSampleStep = isMassive ? 2 : 1; 
 
   useEffect(() => {
-    if (!isPlaying) return undefined;
+    return () => {
+      animationStopRef.current?.();
+      engineRef.current.stop();
+    };
+  }, []);
 
-    const stopAnimation = engineRef.current.play({
+  const handleReset = (resetToFinal = false) => {
+    setIsPlaying(false);
+    animationStopRef.current?.();
+    animationStopRef.current = null;
+    engineRef.current.renderStatic(resetToFinal ? 1 : 0, 1);
+  };
+
+  const handlePlay = () => {
+    handleReset(false);
+    setIsPlaying(true);
+    animationStopRef.current = engineRef.current.play({
       motionSampleStep,
       onComplete: () => {
         setIsPlaying(false);
         handleReset(true);
       }
     });
-
-    return () => {
-      stopAnimation?.();
-      engineRef.current.stop();
-    };
-  }, [isPlaying, motionSampleStep]);
-
-  const handleReset = (resetToFinal = false) => {
-    setIsPlaying(false);
-    engineRef.current.renderStatic(resetToFinal ? 1 : 0, 1);
-  };
-
-  const handlePlay = () => {
-    handleReset(false);
-    requestAnimationFrame(() => setIsPlaying(true));
   };
 
   // V6 关键逻辑: 循环映射 (Collapse / Split)
