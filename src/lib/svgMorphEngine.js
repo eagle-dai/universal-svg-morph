@@ -1,5 +1,3 @@
-import { Timeline, animate } from "animejs";
-
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
 export const samplePath = (pathString, sampleCount) => {
@@ -153,7 +151,6 @@ export const buildAnimatedPathD = (fromPoints, toPoints, t, step = 1) => {
 
 export const createMorphEngine = ({ duration = 2000 } = {}) => {
   const registry = new Map();
-  let activeAnimation = null;
 
   const register = (item) => {
     const id = Symbol("morph-item");
@@ -178,9 +175,8 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     timeline = null,
     offset = 0,
   } = {}) => {
-    // 如果有正在运行的独立动画，先停止
-    if (activeAnimation && !timeline) {
-      activeAnimation.pause();
+    if (!timeline) {
+      throw new Error("createMorphEngine.play 需要传入有效的 timeline 实例");
     }
 
     const progress = { value: 0 };
@@ -210,20 +206,10 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
       },
     };
 
-    if (timeline) {
-      timeline.add(progress, animOptions, offset);
-    } else {
-      activeAnimation = animate(progress, animOptions);
-      return () => activeAnimation?.pause();
-    }
+    timeline.add(progress, animOptions, offset);
   };
 
-  const stop = () => {
-    if (activeAnimation) {
-      activeAnimation.pause();
-      activeAnimation = null;
-    }
-  };
+  const stop = () => {};
 
   return {
     register,
