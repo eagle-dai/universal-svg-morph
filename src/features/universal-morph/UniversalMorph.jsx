@@ -118,6 +118,10 @@ const generateGrid = (rows, cols) => {
   return paths;
 };
 
+const generateDiamond = () => {
+  return ["M 100,20 L 180,100 L 100,180 L 20,100 Z"];
+};
+
 const generateSwarm = (count) => {
   const paths = [];
   for (let i = 0; i < count; i++) {
@@ -135,6 +139,14 @@ const generateSwarm = (count) => {
     }
   }
   return paths;
+};
+
+const generateMountainRange = () => {
+  return [
+    "M 20,160 L 70,80 L 120,160 Z",
+    "M 80,160 L 130,60 L 180,160 Z",
+    "M 45,140 L 70,110 L 95,140 Z",
+  ];
 };
 
 const generateSmileFace = () => {
@@ -199,6 +211,22 @@ const generateLayers = () => {
   ];
 };
 
+const generateRipples = () => {
+  return [
+    "M 100,100 m -15,0 a 15,15 0 1,0 30,0 a 15,15 0 1,0 -30,0",
+    "M 100,100 m -35,0 a 35,35 0 1,0 70,0 a 35,35 0 1,0 -70,0",
+    "M 100,100 m -55,0 a 55,55 0 1,0 110,0 a 55,55 0 1,0 -110,0",
+  ];
+};
+
+const generateWaveField = () => {
+  return [
+    "M 20,70 Q 60,40 100,70 T 180,70",
+    "M 20,110 Q 60,80 100,110 T 180,110",
+    "M 20,150 Q 60,120 100,150 T 180,150",
+  ];
+};
+
 // --- 3. 图形库 ---
 const SHAPE_LIBRARY = {
   basic: {
@@ -225,6 +253,12 @@ const SHAPE_LIBRARY = {
         icon: Hexagon,
         paths: ["M 100,20 L 170,60 L 170,140 L 100,180 L 30,140 L 30,60 Z"],
         colors: ["#F59E0B"],
+      },
+      diamond: {
+        label: "菱形 (1)",
+        icon: Circle,
+        paths: generateDiamond(),
+        colors: ["#38BDF8"],
       },
     },
   },
@@ -259,6 +293,12 @@ const SHAPE_LIBRARY = {
         paths: generateCircuit(),
         colors: ["#0EA5E9", "#0284C7", "#0369A1", "#075985", "#0C4A6E"],
       },
+      mountain: {
+        label: "山脉 (3)",
+        icon: Home,
+        paths: generateMountainRange(),
+        colors: ["#10B981", "#34D399", "#059669"],
+      },
     },
   },
   stress: {
@@ -282,6 +322,12 @@ const SHAPE_LIBRARY = {
         paths: generateGrid(15, 15),
         colors: ["#10B981", "#34D399", "#059669"],
       },
+      grid400: {
+        label: "400 元素",
+        icon: Grid,
+        paths: generateGrid(20, 20),
+        colors: ["#F87171", "#FB7185", "#F43F5E"],
+      },
     },
   },
   abstract: {
@@ -304,6 +350,18 @@ const SHAPE_LIBRARY = {
           "M 100,10 Q 160,100 100,190",
         ],
         colors: ["#2563EB", "#3B82F6", "#60A5FA", "#93C5FD", "#BFDBFE"],
+      },
+      ripples: {
+        label: "涟漪 (3)",
+        icon: Circle,
+        paths: generateRipples(),
+        colors: ["#22D3EE", "#38BDF8", "#7DD3FC"],
+      },
+      wave: {
+        label: "波纹 (3)",
+        icon: Wind,
+        paths: generateWaveField(),
+        colors: ["#A78BFA", "#8B5CF6", "#C4B5FD"],
       },
     },
   },
