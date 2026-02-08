@@ -1,8 +1,10 @@
-const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+import { animate, linear } from "animejs";
+
+const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
 export const samplePath = (pathString, sampleCount) => {
-  const path = document.createElementNS(SVG_NAMESPACE, 'path');
-  path.setAttribute('d', pathString);
+  const path = document.createElementNS(SVG_NAMESPACE, "path");
+  path.setAttribute("d", pathString);
   const len = path.getTotalLength();
   const points = [];
   for (let i = 0; i < sampleCount; i++) {
@@ -38,11 +40,7 @@ export const findBestOffset = (pointsA, pointsB, samples, isMassive) => {
 };
 
 export const createMorphInterpolator = (startD, endD, options = {}) => {
-  const {
-    samples = 120,
-    optimize = true,
-    isMassive = false
-  } = options;
+  const { samples = 120, optimize = true, isMassive = false } = options;
 
   if (!startD || !endD) return null;
   const pointsA = samplePath(startD, samples);
@@ -52,7 +50,10 @@ export const createMorphInterpolator = (startD, endD, options = {}) => {
   if (optimize) {
     const offset = findBestOffset(pointsA, pointsBRaw, samples, isMassive);
     if (offset !== 0) {
-      pointsBFinal = [...pointsBRaw.slice(offset), ...pointsBRaw.slice(0, offset)];
+      pointsBFinal = [
+        ...pointsBRaw.slice(offset),
+        ...pointsBRaw.slice(0, offset),
+      ];
     }
   }
 
@@ -61,10 +62,17 @@ export const createMorphInterpolator = (startD, endD, options = {}) => {
 
 const hexToRgb = (hex) => {
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  const normalized = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+  const normalized = hex.replace(
+    shorthandRegex,
+    (m, r, g, b) => r + r + g + g + b + b,
+  );
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(normalized);
   return result
-    ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
+    ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16),
+      ]
     : [0, 0, 0];
 };
 
@@ -73,7 +81,7 @@ export const createColorLerp = (color1, color2) => {
   const [r2, g2, b2] = hexToRgb(color2);
   return {
     start: [r1, g1, b1],
-    diff: [r2 - r1, g2 - g1, b2 - b1]
+    diff: [r2 - r1, g2 - g1, b2 - b1],
   };
 };
 
@@ -85,8 +93,8 @@ export const lerpColor = (colorData, factor) => {
 };
 
 export const buildStaticPathD = (points, precision = 1) => {
-  if (!points?.length) return '';
-  let d = 'M';
+  if (!points?.length) return "";
+  let d = "M";
   for (let i = 0; i < points.length; i++) {
     d += `${points[i].x.toFixed(precision)},${points[i].y.toFixed(precision)}L`;
   }
@@ -94,8 +102,8 @@ export const buildStaticPathD = (points, precision = 1) => {
 };
 
 export const buildAnimatedPathD = (fromPoints, toPoints, t, step = 1) => {
-  if (!fromPoints?.length) return '';
-  let d = 'M';
+  if (!fromPoints?.length) return "";
+  let d = "M";
   for (let i = 0; i < fromPoints.length; i += step) {
     const x = fromPoints[i].x + (toPoints[i].x - fromPoints[i].x) * t;
     const y = fromPoints[i].y + (toPoints[i].y - fromPoints[i].y) * t;
@@ -106,11 +114,11 @@ export const buildAnimatedPathD = (fromPoints, toPoints, t, step = 1) => {
 
 export const createMorphEngine = ({ duration = 2000 } = {}) => {
   const registry = new Map();
-  let rafId = null;
+  let animation = null;
   let frameCount = 0;
 
   const register = (item) => {
-    const id = Symbol('morph-item');
+    const id = Symbol("morph-item");
     registry.set(id, item);
     return () => registry.delete(id);
   };
@@ -120,51 +128,65 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
       const target = t >= 1 ? data.b : data.a;
       const d = buildStaticPathD(target.slice(0, samples), precision);
       const c = lerpColor(color, t);
-      dom.setAttribute('d', d);
-      dom.setAttribute('fill', c);
-      dom.setAttribute('stroke', c);
+      dom.setAttribute("d", d);
+      dom.setAttribute("fill", c);
+      dom.setAttribute("stroke", c);
     });
   };
 
-  const play = ({ shouldThrottle = false, motionSampleStep = 1, onComplete } = {}) => {
-    let startTime;
+  const play = ({
+    shouldThrottle = false,
+    motionSampleStep = 1,
+    onComplete,
+  } = {}) => {
     frameCount = 0;
+    if (animation) {
+      animation.pause();
+      animation = null;
+    }
 
-    const animate = (time) => {
-      if (!startTime) startTime = time;
-      frameCount += 1;
+    // 使用更明确的属性名 'value'，避免 't' 可能造成的混淆
+    const progress = { value: 0 };
 
-      if (shouldThrottle && frameCount % 2 !== 0) {
-        rafId = requestAnimationFrame(animate);
-        return;
-      }
+    // Anime.js v4 语法：animate(targets, parameters)
+    animation = animate(progress, {
+      value: 1, // 目标值
+      duration: duration,
+      ease: linear,
+      onUpdate: () => {
+        frameCount += 1;
+        if (shouldThrottle && frameCount % 2 !== 0) return;
 
-      const elapsed = time - startTime;
-      const t = Math.min(elapsed / duration, 1);
+        // 读取当前进度
+        const t = Math.min(progress.value, 1);
 
-      registry.forEach(({ dom, data, color }) => {
-        const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
-        const curColor = lerpColor(color, t);
-        dom.setAttribute('d', d);
-        dom.setAttribute('fill', curColor);
-        dom.setAttribute('stroke', curColor);
-      });
+        registry.forEach(({ dom, data, color }) => {
+          const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
+          const curColor = lerpColor(color, t);
+          dom.setAttribute("d", d);
+          dom.setAttribute("fill", curColor);
+          dom.setAttribute("stroke", curColor);
+        });
+      },
+      onComplete: () => {
+        registry.forEach(({ dom, data, color }) => {
+          const d = buildAnimatedPathD(data.a, data.b, 1, motionSampleStep);
+          const curColor = lerpColor(color, 1);
+          dom.setAttribute("d", d);
+          dom.setAttribute("fill", curColor);
+          dom.setAttribute("stroke", curColor);
+        });
+        onComplete?.();
+      },
+    });
 
-      if (t < 1) {
-        rafId = requestAnimationFrame(animate);
-      } else if (onComplete) {
-        onComplete();
-      }
-    };
-
-    rafId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafId);
+    return () => animation?.pause();
   };
 
   const stop = () => {
-    if (rafId) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
+    if (animation) {
+      animation.pause();
+      animation = null;
     }
   };
 
@@ -172,6 +194,6 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     register,
     renderStatic,
     play,
-    stop
+    stop,
   };
 };
