@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 're
 import { 
   ArrowLeft, Play, Pause, Grid, Menu, X, Circle, Settings2, Zap, Layers, 
   Home, Cloud, Smile, Bot, Ghost, Grip, Feather, Hexagon, Aperture, 
-  Thermometer, Activity, Cpu, Globe, Anchor, Box, Sparkles, Gauge,
+  Thermometer, Activity, Cpu, Globe, Anchor, Box, Sparkles,
   Wind, ZapOff
 } from 'lucide-react';
 import {
@@ -214,7 +214,6 @@ export default function UniversalMorph({ onBack }) {
   const [endKey, setEndKey] = useState('grid225'); 
   const [isPlaying, setIsPlaying] = useState(false);
   const [optimize, setOptimize] = useState(true);
-  const [perfThrottle, setPerfThrottle] = useState(true);
   
   const engineRef = useRef(null);
   if (!engineRef.current) {
@@ -243,7 +242,6 @@ export default function UniversalMorph({ onBack }) {
     if (!isPlaying) return undefined;
 
     const stopAnimation = engineRef.current.play({
-      shouldThrottle: perfThrottle && isMassive,
       motionSampleStep,
       onComplete: () => {
         setIsPlaying(false);
@@ -255,7 +253,7 @@ export default function UniversalMorph({ onBack }) {
       stopAnimation?.();
       engineRef.current.stop();
     };
-  }, [isPlaying, isMassive, perfThrottle, motionSampleStep]);
+  }, [isPlaying, motionSampleStep]);
 
   const handleReset = (resetToFinal = false) => {
     setIsPlaying(false);
@@ -329,18 +327,6 @@ export default function UniversalMorph({ onBack }) {
             {optimize ? "智能对齐: ON" : "智能对齐: OFF"}
           </button>
 
-          <button 
-            onClick={() => { setPerfThrottle(!perfThrottle); handleReset(false); }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border ${
-              perfThrottle
-                ? 'bg-blue-500/10 border-blue-500/50 text-blue-400'
-                : 'bg-slate-800 border-slate-700 text-slate-500'
-            }`}
-          >
-            <Gauge size={14} />
-            {perfThrottle ? "性能节流: ON" : "性能节流: OFF"}
-          </button>
-          
           <button 
             onClick={handlePlay}
             disabled={isPlaying}
@@ -449,7 +435,7 @@ export default function UniversalMorph({ onBack }) {
               <h4 className="text-xs font-bold text-slate-400 mb-3 flex items-center gap-2">
                   <Cpu size={12}/> V6 全员聚合统计
               </h4>
-              <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="bg-slate-950 rounded p-2">
                       <div className="text-[10px] text-slate-500">活跃元素</div>
                       <div className="text-sm font-mono text-emerald-400">{maxPaths}</div>
@@ -461,12 +447,6 @@ export default function UniversalMorph({ onBack }) {
                   <div className="bg-slate-950 rounded p-2">
                       <div className="text-[10px] text-slate-500">采样精度</div>
                       <div className="text-sm font-mono text-purple-400">{staticSamples}点</div>
-                  </div>
-                  <div className="bg-slate-950 rounded p-2">
-                      <div className="text-[10px] text-slate-500">性能提示</div>
-                      <div className={`text-[11px] font-mono ${perfThrottle && isMassive ? 'text-emerald-400' : 'text-slate-400'}`}>
-                        {perfThrottle && isMassive ? "半帧节流" : "全帧渲染"}
-                      </div>
                   </div>
               </div>
           </div>
