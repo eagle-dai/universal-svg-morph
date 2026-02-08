@@ -451,6 +451,17 @@ Object.values(SHAPE_LIBRARY).forEach((category) => {
   });
 });
 
+const DEMO_LAYOUT = {
+  separationOffset: 28,
+};
+
+const offsetPoints = (points, dx = 0, dy = 0) => {
+  return points.map((point) => ({
+    x: point.x + dx,
+    y: point.y + dy,
+  }));
+};
+
 // --- 5. 路径组件 (使用 memo 锁定渲染) ---
 const MorphingPath = memo(
   ({
@@ -462,16 +473,33 @@ const MorphingPath = memo(
     samples,
     isMassive,
     onRegister,
+    separate,
+    separationOffset,
   }) => {
     const pathRef = useRef(null);
 
     const interpolator = useMemo(() => {
-      return createMorphInterpolator(startD, endD, {
+      const baseInterpolator = createMorphInterpolator(startD, endD, {
         samples,
         optimize,
         isMassive,
       });
-    }, [startD, endD, optimize, samples, isMassive]);
+      if (!baseInterpolator || !separate) {
+        return baseInterpolator;
+      }
+      return {
+        a: offsetPoints(baseInterpolator.a, -separationOffset, 0),
+        b: offsetPoints(baseInterpolator.b, separationOffset, 0),
+      };
+    }, [
+      startD,
+      endD,
+      optimize,
+      samples,
+      isMassive,
+      separate,
+      separationOffset,
+    ]);
 
     const colorData = useMemo(() => {
       return createColorLerp(startColor, endColor);
@@ -516,6 +544,7 @@ export default function UniversalMorph({ onBack }) {
   const [endKey, setEndKey] = useState("grid225");
   const [isPlaying, setIsPlaying] = useState(false);
   const [optimize, setOptimize] = useState(true);
+  const [separate, setSeparate] = useState(false);
   const containerRef = useRef(null); // 用于演示 Timeline 控制其他元素
 
   const engineRef = useRef(null);
@@ -680,6 +709,21 @@ export default function UniversalMorph({ onBack }) {
           </button>
 
           <button
+            onClick={() => {
+              setSeparate(!separate);
+              handleReset(false);
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border ${
+              separate
+                ? "bg-blue-500/10 border-blue-500/50 text-blue-300"
+                : "bg-slate-800 border-slate-700 text-slate-500"
+            }`}
+          >
+            <Layers size={14} />
+            {separate ? "源/目标分离: ON" : "源/目标分离: OFF"}
+          </button>
+
+          <button
             onClick={handleSwap}
             className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border bg-slate-800 border-slate-700 text-slate-200 hover:border-blue-400/70 hover:text-blue-300"
           >
@@ -790,7 +834,7 @@ export default function UniversalMorph({ onBack }) {
         </div>
 
         {/* 右侧：舞台 */}
-        <div className="lg:w-[500px] flex flex-col items-center sticky top-24 h-fit">
+        <div className="lg:w-[560px] flex flex-col items-center sticky top-24 h-fit">
           {/* 添加 ref 到 container 以便 Timeline 控制 */}
           <div
             ref={containerRef}
@@ -808,7 +852,7 @@ export default function UniversalMorph({ onBack }) {
 
             <svg
               viewBox="0 0 200 200"
-              className="w-full h-full overflow-visible relative z-10 p-8"
+              className="w-full h-full overflow-visible relative z-10 p-10"
               style={{ filter: "drop-shadow(0 0 15px rgba(0,0,0,0.5))" }}
             >
               {renderItems.map((item) => (
@@ -822,6 +866,8 @@ export default function UniversalMorph({ onBack }) {
                   samples={staticSamples}
                   isMassive={isMassive}
                   onRegister={handleRegister}
+                  separate={separate}
+                  separationOffset={DEMO_LAYOUT.separationOffset}
                 />
               ))}
             </svg>
