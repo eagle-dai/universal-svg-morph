@@ -5,10 +5,10 @@
 - 入口页面与静态资源位于 `index.html`。
 
 ## 开发与运行
-- 安装依赖：`npm install`
-- 本地开发：`npm run dev`
-- 构建：`npm run build`
-- 预览：`npm run preview`
+- 安装依赖：`yarn install`
+- 本地开发：`yarn dev`
+- 构建：`yarn build`
+- 预览：`yarn preview`
 
 ## 代码与目录规范
 - 新功能或修复优先放在 `src/` 内，保持模块职责单一。
@@ -16,7 +16,7 @@
 - 避免在代码中硬编码可配置项，尽量集中管理。
 
 ## 变更与提交
-- 提交前确保通过现有测试或构建检查（如 `npm run build`）。
+- 提交前确保通过现有测试或构建检查（如 `yarn build`）。
 - 提交信息建议使用简洁的英文动词开头（如 `Add`, `Fix`, `Refactor`）。
 
 ## 其他
