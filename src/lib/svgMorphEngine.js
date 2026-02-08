@@ -1,3 +1,5 @@
+import { animate } from 'animejs';
+
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 export const samplePath = (pathString, sampleCount) => {
@@ -106,7 +108,7 @@ export const buildAnimatedPathD = (fromPoints, toPoints, t, step = 1) => {
 
 export const createMorphEngine = ({ duration = 2000 } = {}) => {
   const registry = new Map();
-  let rafId = null;
+  let animation = null;
   let frameCount = 0;
 
   const register = (item) => {
@@ -127,44 +129,50 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
   };
 
   const play = ({ shouldThrottle = false, motionSampleStep = 1, onComplete } = {}) => {
-    let startTime;
     frameCount = 0;
+    if (animation) {
+      animation.pause();
+      animation = null;
+    }
 
-    const animate = (time) => {
-      if (!startTime) startTime = time;
-      frameCount += 1;
+    const progress = { t: 0 };
 
-      if (shouldThrottle && frameCount % 2 !== 0) {
-        rafId = requestAnimationFrame(animate);
-        return;
+    animation = animate(progress, {
+      t: 1,
+      duration,
+      easing: 'linear',
+      update: () => {
+        frameCount += 1;
+        if (shouldThrottle && frameCount % 2 !== 0) return;
+        const t = Math.min(progress.t, 1);
+
+        registry.forEach(({ dom, data, color }) => {
+          const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
+          const curColor = lerpColor(color, t);
+          dom.setAttribute('d', d);
+          dom.setAttribute('fill', curColor);
+          dom.setAttribute('stroke', curColor);
+        });
+      },
+      complete: () => {
+        registry.forEach(({ dom, data, color }) => {
+          const d = buildAnimatedPathD(data.a, data.b, 1, motionSampleStep);
+          const curColor = lerpColor(color, 1);
+          dom.setAttribute('d', d);
+          dom.setAttribute('fill', curColor);
+          dom.setAttribute('stroke', curColor);
+        });
+        onComplete?.();
       }
+    });
 
-      const elapsed = time - startTime;
-      const t = Math.min(elapsed / duration, 1);
-
-      registry.forEach(({ dom, data, color }) => {
-        const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
-        const curColor = lerpColor(color, t);
-        dom.setAttribute('d', d);
-        dom.setAttribute('fill', curColor);
-        dom.setAttribute('stroke', curColor);
-      });
-
-      if (t < 1) {
-        rafId = requestAnimationFrame(animate);
-      } else if (onComplete) {
-        onComplete();
-      }
-    };
-
-    rafId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafId);
+    return () => animation?.pause();
   };
 
   const stop = () => {
-    if (rafId) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
+    if (animation) {
+      animation.pause();
+      animation = null;
     }
   };
 

@@ -1,6 +1,6 @@
 # 通用 SVG 变形引擎 (Universal SVG Morphing Engine)
 
-这是一个基于 React 的高性能 SVG 路径变形（Morphing）演示项目。旨在探索不依赖 GSAP MorphSVG 等付费库的情况下，如何实现任意 SVG 形状、任意数量元素之间的平滑过渡动画。
+这是一个基于 React 的高性能 SVG 路径变形（Morphing）演示项目。旨在探索不依赖 GSAP MorphSVG 等付费库的情况下，如何实现任意 SVG 形状、任意数量元素之间的平滑过渡动画，并使用 anime.js 4.x 进行动画调度。
 
 ## 🚀 项目演变与核心功能
 
@@ -31,7 +31,7 @@ SVG 的 d 属性指令各不相同（如 C 曲线对 L 直线）。为了实现�
 
 ### 1. 绕过 React 渲染 (Direct DOM Manipulation)
 - 痛点：React 的 setState -> Diff -> Render 流程在每帧高频调用下开销过大。
-- 方案：使用 useRef 获取 DOM 节点，在 requestAnimationFrame 循环中直接调用 element.setAttribute('d', ...)。
+- 方案：使用 useRef 获取 DOM 节点，在 anime.js 的更新回调中直接调用 element.setAttribute('d', ...)。
 - 收益：性能提升约 10 倍，消除了 React 调和过程的开销。
 
 ### 2. 动态精度调整 (Dynamic LOD - Level of Detail)
@@ -55,7 +55,7 @@ SVG 的 d 属性指令各不相同（如 C 曲线对 L 直线）。为了实现�
 ## 🛠 代码结构
 - src/data/menuItems.js: 入口菜单的 Tile 配置（标题、描述、主题色等）。
 - src/pages/EntryMenu.jsx: 新入口菜单页面，负责渲染功能入口。
-- src/lib/svgMorphEngine.js: 独立的 SVG morph 引擎模块。
+- src/lib/svgMorphEngine.js: 独立的 SVG morph 引擎模块，动画驱动改由 anime.js 4.x 负责调度。
   - samplePath / createMorphInterpolator: 路径采样与对齐。
   - createColorLerp / lerpColor: 颜色插值。
   - buildStaticPathD / buildAnimatedPathD: 路径字符串构建。
@@ -113,6 +113,7 @@ const interpolator = createMorphInterpolator(startD, endD, {
 const color = createColorLerp('#3B82F6', '#F59E0B');
 
 // 注册 DOM 节点后即可调用 engine.play / engine.renderStatic
+// 引擎内部使用 anime.js 4.x 控制动画时序
 ```
 
 ## 🔮 未来展望
