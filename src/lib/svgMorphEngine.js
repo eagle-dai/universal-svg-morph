@@ -157,10 +157,12 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
       });
     };
 
-    // 1. 立即渲染第 0 帧（防止闪烁）
-    renderFrame(0);
+    // [Fix]: 删除了 renderFrame(0) 的立即调用。
+    // 这解决了当 timeline 存在 offset 时，图形会立即跳变为第0帧（低精度/整数坐标）
+    // 导致在 offset 等待期间出现视觉跳动的问题。
+    // 现在的逻辑是：直到 timeline 真正更新到这个节点，onUpdate 才会触发渲染。
 
-    // 2. 动画参数 (注意：这里不要包含 targets)
+    // 2. 动画参数
     const animOptions = {
       value: 1,
       duration: duration,
@@ -176,12 +178,10 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     };
 
     if (timeline) {
-      // Anime.js v4 语法 timeline.add(targets, options, offset) 必须把 progress 作为第一个参数单独传入
+      // Anime.js v4 语法 timeline.add(targets, options, offset)
       timeline.add(progress, animOptions, offset);
-
-      // 注意：Timeline 模式不需要在这里返回 stop，由 timeline 实例控制
     } else {
-      // Anime.js v4 语法 animate(targets, options) 必须把 progress 作为第一个参数单独传入
+      // Anime.js v4 语法 animate(targets, options)
       activeAnimation = animate(progress, animOptions);
       return () => activeAnimation?.pause();
     }
