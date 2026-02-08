@@ -105,7 +105,7 @@ import {
   buildStaticPathD
 } from './lib/svgMorphEngine';
 
-const engine = createMorphEngine({ duration: 2000 });
+const engine = createMorphEngine({ duration: 2000 }); // duration 单位：毫秒
 const interpolator = createMorphInterpolator(startD, endD, {
   samples: 120,
   optimize: true

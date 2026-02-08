@@ -140,8 +140,8 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     animation = animate(progress, {
       t: 1,
       duration,
-      easing: 'linear',
-      update: () => {
+      ease: 'linear',
+      onUpdate: () => {
         frameCount += 1;
         if (shouldThrottle && frameCount % 2 !== 0) return;
         const t = Math.min(progress.t, 1);
@@ -154,7 +154,7 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
           dom.setAttribute('stroke', curColor);
         });
       },
-      complete: () => {
+      onComplete: () => {
         registry.forEach(({ dom, data, color }) => {
           const d = buildAnimatedPathD(data.a, data.b, 1, motionSampleStep);
           const curColor = lerpColor(color, 1);
