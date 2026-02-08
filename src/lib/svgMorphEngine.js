@@ -141,8 +141,18 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
 
     // 使用更明确的属性名 'value'，避免 't' 可能造成的混淆
     const progress = { value: 0 };
+    const renderAnimatedFrame = (t) => {
+      registry.forEach(({ dom, data, color }) => {
+        const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
+        const curColor = lerpColor(color, t);
+        dom.setAttribute("d", d);
+        dom.setAttribute("fill", curColor);
+        dom.setAttribute("stroke", curColor);
+      });
+    };
 
     // Anime.js v4 语法：animate(targets, parameters)
+    renderAnimatedFrame(0);
     animation = animate(progress, {
       value: 1, // 目标值
       duration: duration,
@@ -151,22 +161,10 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
         // 读取当前进度
         const t = Math.min(progress.value, 1);
 
-        registry.forEach(({ dom, data, color }) => {
-          const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
-          const curColor = lerpColor(color, t);
-          dom.setAttribute("d", d);
-          dom.setAttribute("fill", curColor);
-          dom.setAttribute("stroke", curColor);
-        });
+        renderAnimatedFrame(t);
       },
       onComplete: () => {
-        registry.forEach(({ dom, data, color }) => {
-          const d = buildAnimatedPathD(data.a, data.b, 1, motionSampleStep);
-          const curColor = lerpColor(color, 1);
-          dom.setAttribute("d", d);
-          dom.setAttribute("fill", curColor);
-          dom.setAttribute("stroke", curColor);
-        });
+        renderAnimatedFrame(1);
         onComplete?.();
       },
     });
