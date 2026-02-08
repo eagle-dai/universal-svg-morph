@@ -326,9 +326,12 @@ export default function UniversalMorph() {
     const animate = (time) => {
       if (!startTime) startTime = time;
       
-      // FPS Throttling (可选，目前注释掉以追求流畅度)
+      // FPS Throttling (压力模式自动开启)
       frameCountRef.current++;
-      // if (isMassive && frameCountRef.current % 2 !== 0) { ... }
+      if (isMassive && frameCountRef.current % 2 !== 0) {
+        reqId = requestAnimationFrame(animate);
+        return;
+      }
 
       const elapsed = time - startTime;
       const t = Math.min(elapsed / duration, 1);
@@ -390,6 +393,7 @@ export default function UniversalMorph() {
 
   const handlePlay = () => {
     handleReset(false);
+    frameCountRef.current = 0;
     requestAnimationFrame(() => setIsPlaying(true));
   };
 
@@ -551,7 +555,7 @@ export default function UniversalMorph() {
               <h4 className="text-xs font-bold text-slate-400 mb-3 flex items-center gap-2">
                   <Cpu size={12}/> V6 全员聚合统计
               </h4>
-              <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="grid grid-cols-4 gap-2 text-center">
                   <div className="bg-slate-950 rounded p-2">
                       <div className="text-[10px] text-slate-500">活跃元素</div>
                       <div className="text-sm font-mono text-emerald-400">{maxPaths}</div>
@@ -563,6 +567,12 @@ export default function UniversalMorph() {
                   <div className="bg-slate-950 rounded p-2">
                       <div className="text-[10px] text-slate-500">采样精度</div>
                       <div className="text-sm font-mono text-purple-400">{staticSamples}点</div>
+                  </div>
+                  <div className="bg-slate-950 rounded p-2">
+                      <div className="text-[10px] text-slate-500">帧率策略</div>
+                      <div className={`text-sm font-mono ${isMassive ? 'text-amber-400' : 'text-slate-300'}`}>
+                        {isMassive ? '30fps 节流' : '60fps 全速'}
+                      </div>
                   </div>
               </div>
           </div>
