@@ -452,7 +452,7 @@ Object.values(SHAPE_LIBRARY).forEach((category) => {
 });
 
 const DEMO_LAYOUT = {
-  separationOffset: 40,
+  separationOffset: 28,
 };
 
 const offsetPoints = (points, dx = 0, dy = 0) => {
