@@ -1,4 +1,4 @@
-import { animate, linear } from "animejs";
+import { Timeline, animate } from "animejs";
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 
@@ -114,7 +114,7 @@ export const buildAnimatedPathD = (fromPoints, toPoints, t, step = 1) => {
 
 export const createMorphEngine = ({ duration = 2000 } = {}) => {
   const registry = new Map();
-  let animation = null;
+  let activeAnimation = null;
 
   const register = (item) => {
     const id = Symbol("morph-item");
@@ -133,51 +133,67 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     });
   };
 
-  const play = ({ motionSampleStep = 1, onComplete } = {}) => {
-    if (animation) {
-      animation.pause();
-      animation = null;
+  const play = ({ 
+    motionSampleStep = 1, 
+    onComplete, 
+    timeline = null,
+    offset = 0 
+  } = {}) => {
+    
+    // 如果有正在运行的独立动画，先停止
+    if (activeAnimation && !timeline) {
+      activeAnimation.pause();
     }
 
-    // 使用更明确的属性名 'value'，避免 't' 可能造成的混淆
     const progress = { value: 0 };
 
-    // Anime.js v4 语法：animate(targets, parameters)
-    animation = animate(progress, {
-      value: 1, // 目标值
-      duration: duration,
-      ease: linear,
-      onUpdate: () => {
-        // 读取当前进度
-        const t = Math.min(progress.value, 1);
-
-        registry.forEach(({ dom, data, color }) => {
+    // 渲染帧逻辑
+    const renderFrame = (t) => {
+       registry.forEach(({ dom, data, color }) => {
           const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
           const curColor = lerpColor(color, t);
           dom.setAttribute("d", d);
           dom.setAttribute("fill", curColor);
           dom.setAttribute("stroke", curColor);
         });
+    };
+
+    // 1. 立即渲染第 0 帧（防止闪烁）
+    renderFrame(0);
+
+    // 2. 动画参数 (注意：这里不要包含 targets)
+    const animOptions = {
+      value: 1,
+      duration: duration,
+      easing: 'linear', 
+      onUpdate: () => {
+        const t = Math.min(progress.value, 1);
+        renderFrame(t);
       },
       onComplete: () => {
-        registry.forEach(({ dom, data, color }) => {
-          const d = buildAnimatedPathD(data.a, data.b, 1, motionSampleStep);
-          const curColor = lerpColor(color, 1);
-          dom.setAttribute("d", d);
-          dom.setAttribute("fill", curColor);
-          dom.setAttribute("stroke", curColor);
-        });
+        renderFrame(1);
         onComplete?.();
-      },
-    });
+      }
+    };
 
-    return () => animation?.pause();
+    if (timeline) {
+      // 关键修复：Anime.js v4 语法 timeline.add(targets, options, offset)
+      // 必须把 progress 作为第一个参数单独传入
+      timeline.add(progress, animOptions, offset);
+      
+      // 注意：Timeline 模式不需要在这里返回 stop，由 timeline 实例控制
+    } else {
+      // 关键修复：Anime.js v4 语法 animate(targets, options)
+      // 必须把 progress 作为第一个参数单独传入
+      activeAnimation = animate(progress, animOptions);
+      return () => activeAnimation?.pause();
+    }
   };
 
   const stop = () => {
-    if (animation) {
-      animation.pause();
-      animation = null;
+    if (activeAnimation) {
+      activeAnimation.pause();
+      activeAnimation = null;
     }
   };
 
