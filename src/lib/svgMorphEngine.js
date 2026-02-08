@@ -101,13 +101,19 @@ export const buildStaticPathD = (points, precision = 1) => {
   return `${d.slice(0, -1)}Z`;
 };
 
-export const buildAnimatedPathD = (fromPoints, toPoints, t, step = 1) => {
+export const buildAnimatedPathD = (
+  fromPoints,
+  toPoints,
+  t,
+  step = 1,
+  precision = 1,
+) => {
   if (!fromPoints?.length) return "";
   let d = "M";
   for (let i = 0; i < fromPoints.length; i += step) {
     const x = fromPoints[i].x + (toPoints[i].x - fromPoints[i].x) * t;
     const y = fromPoints[i].y + (toPoints[i].y - fromPoints[i].y) * t;
-    d += `${(x + 0.5) | 0},${(y + 0.5) | 0}L`;
+    d += `${x.toFixed(precision)},${y.toFixed(precision)}L`;
   }
   return `${d.slice(0, -1)}Z`;
 };
