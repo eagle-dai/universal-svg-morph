@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useLayoutEffect, memo } from 'react';
 import { 
   ArrowLeft, Play, Pause, Grid, Menu, X, Circle, Settings2, Zap, Layers, 
   Home, Cloud, Smile, Bot, Ghost, Grip, Feather, Hexagon, Aperture, 
   Thermometer, Activity, Cpu, Globe, Anchor, Box, Sparkles,
   Wind, ZapOff
 } from 'lucide-react';
+import { Timeline } from 'animejs'; // 引入 Timeline
 import {
   buildStaticPathD,
   createColorLerp,
@@ -12,9 +13,7 @@ import {
   createMorphInterpolator
 } from '../../lib/svgMorphEngine.js';
 
-// --- 1. 复杂路径生成器 ---
-
-// 生成城市天际线
+// --- 1. 复杂路径生成器 (保持不变) ---
 const generateCitySkyline = () => {
   let d = "M 10,180 ";
   let x = 10;
@@ -28,7 +27,6 @@ const generateCitySkyline = () => {
   return [d, "M 30,30 Q 50,10 70,30 T 110,30", "M 140,50 Q 150,40 160,50"];
 };
 
-// 生成曼陀罗花
 const generateFlower = () => {
   const paths = [];
   const center = 100;
@@ -49,7 +47,6 @@ const generateFlower = () => {
   return paths;
 };
 
-// 生成电路板
 const generateCircuit = () => {
   return [
     "M 40,40 L 90,40 L 90,90 M 85,90 a 5,5 0 1,0 10,0 a 5,5 0 1,0 -10,0",
@@ -60,7 +57,6 @@ const generateCircuit = () => {
   ];
 };
 
-// 模拟书法字
 const generateCalligraphy = () => {
   return [
     "M 90,30 Q 100,20 110,30 Q 120,40 100,50",
@@ -70,7 +66,6 @@ const generateCalligraphy = () => {
   ];
 };
 
-// 生成密集网格
 const generateGrid = (rows, cols) => {
   const paths = [];
   const padding = 20;
@@ -79,7 +74,6 @@ const generateGrid = (rows, cols) => {
   const cellW = width / cols;
   const cellH = height / rows;
   const gap = 1; 
-
   for(let r=0; r<rows; r++) {
     for(let c=0; c<cols; c++) {
       const x = padding + c * cellW + gap;
@@ -92,14 +86,12 @@ const generateGrid = (rows, cols) => {
   return paths;
 };
 
-// 生成随机粒子群
 const generateSwarm = (count) => {
   const paths = [];
   for(let i=0; i<count; i++) {
     const cx = 20 + Math.random() * 160;
     const cy = 20 + Math.random() * 160;
     const size = 2 + Math.random() * 4;
-    // 随机形状：圆形或菱形
     if (Math.random() > 0.5) {
       paths.push(`M ${cx},${cy} m -${size},0 a ${size},${size} 0 1,0 ${size*2},0 a ${size},${size} 0 1,0 -${size*2},0`);
     } else {
@@ -151,8 +143,8 @@ Object.values(SHAPE_LIBRARY).forEach(category => {
   });
 });
 
-// --- 5. 路径组件 (纯粹的占位符与注册器) ---
-const MorphingPath = ({ 
+// --- 5. 路径组件 (使用 memo 锁定渲染) ---
+const MorphingPath = memo(({ 
   startD, endD, startColor, endColor, 
   optimize, samples, isMassive, 
   onRegister 
@@ -160,7 +152,6 @@ const MorphingPath = ({
   
   const pathRef = useRef(null);
 
-  // 预计算几何数据
   const interpolator = useMemo(() => {
     return createMorphInterpolator(startD, endD, {
       samples,
@@ -169,12 +160,10 @@ const MorphingPath = ({
     });
   }, [startD, endD, optimize, samples, isMassive]);
 
-  // 预计算颜色数据
   const colorData = useMemo(() => {
     return createColorLerp(startColor, endColor);
   }, [startColor, endColor]);
 
-  // 注册到主循环
   useLayoutEffect(() => {
     if (pathRef.current && interpolator && onRegister) {
       const unregister = onRegister({
@@ -187,7 +176,6 @@ const MorphingPath = ({
     }
   }, [interpolator, colorData, onRegister, samples]);
 
-  // 初始静态渲染
   const initialD = useMemo(() => {
     if (!interpolator) return "";
     return buildStaticPathD(interpolator.a, 1);
@@ -206,7 +194,7 @@ const MorphingPath = ({
       style={{ willChange: 'd' }} 
     />
   );
-};
+});
 
 // --- 6. 主应用 ---
 export default function UniversalMorph({ onBack }) {
@@ -214,9 +202,12 @@ export default function UniversalMorph({ onBack }) {
   const [endKey, setEndKey] = useState('grid225'); 
   const [isPlaying, setIsPlaying] = useState(false);
   const [optimize, setOptimize] = useState(true);
+  const containerRef = useRef(null); // 用于演示 Timeline 控制其他元素
   
   const engineRef = useRef(null);
-  const animationStopRef = useRef(null);
+  // 全局 Timeline 实例引用，方便 cleanup
+  const timelineRef = useRef(null);
+
   if (!engineRef.current) {
     engineRef.current = createMorphEngine({ duration: 2000 });
   }
@@ -228,46 +219,76 @@ export default function UniversalMorph({ onBack }) {
   const startData = ALL_SHAPES[startKey];
   const endData = ALL_SHAPES[endKey];
   
-  // V6 全员变形策略:
-  // Collapse: 150粒子 -> 1圆 (150个粒子全部飞向圆)
-  // Split: 1圆 -> 150粒子 (圆分裂成150份)
   const maxPaths = Math.max(startData.paths.length, endData.paths.length);
   const isMassive = maxPaths > 100;
   
-  // 采样策略: 全员参与，负载增加，采样数需克制
   const staticSamples = isMassive ? 30 : maxPaths > 50 ? 60 : 120;
-  // 动画时的 LOD
   const motionSampleStep = isMassive ? 2 : 1; 
 
+  // Cleanup
   useEffect(() => {
     return () => {
-      animationStopRef.current?.();
       engineRef.current.stop();
+      if (timelineRef.current) timelineRef.current.pause();
     };
   }, []);
 
   const handleReset = (resetToFinal = false) => {
-    setIsPlaying(false);
-    animationStopRef.current?.();
-    animationStopRef.current = null;
+    if (timelineRef.current) timelineRef.current.pause();
+    engineRef.current.stop();
     engineRef.current.renderStatic(resetToFinal ? 1 : 0, 1);
+    setIsPlaying(false);
   };
 
   const handlePlay = () => {
-    handleReset(false);
     setIsPlaying(true);
-    animationStopRef.current = engineRef.current.play({
-      motionSampleStep,
-      onComplete: () => {
-        setIsPlaying(false);
-        handleReset(true);
-      }
+    
+    // --- 在 JSX 中创建并编排 Timeline ---
+    // Anime.js 4.x 语法
+    const tl = new Timeline({
+        // Timeline 级别的回调
+        onComplete: () => {
+            setIsPlaying(false);
+            engineRef.current.renderStatic(1, 1);
+        }
     });
+    timelineRef.current = tl;
+
+    // 1. 添加一个背景动画 (演示 Timeline 可以控制 DOM)
+    // 假设我们想让容器先缩小一点点，蓄力
+    if (containerRef.current) {
+        tl.add({
+            targets: containerRef.current,
+            scale: [1, 0.95],
+            duration: 300,
+            easing: 'easeOutQuad'
+        }, 0); // 在 0ms 开始
+    }
+
+    // 2. 将 Morph 引擎加入 Timeline
+    // 我们设置 offset 为 200ms，让它在背景动画开始后不久才开始
+    // 这展示了 "engine 可以传入 timeline 并在 jsx 中调整 offset" 的能力
+    engineRef.current.play({
+      timeline: tl,
+      motionSampleStep,
+      offset: 200 // <--- 这里调整偏移
+    });
+
+    // 3. 背景复原动画
+    if (containerRef.current) {
+        tl.add({
+            targets: containerRef.current,
+            scale: [0.95, 1],
+            duration: 800,
+            easing: 'easeOutElastic(1, .8)'
+        }, '-=600'); // 提前 600ms 开始复原
+    }
+
+    // 4. 启动 Timeline
+    tl.play();
   };
 
-  // V6 关键逻辑: 循环映射 (Collapse / Split)
   const renderItems = Array.from({ length: maxPaths }).map((_, i) => {
-    // 使用取模逻辑实现多对一或一对多
     const sIndex = i % startData.paths.length;
     const eIndex = i % endData.paths.length;
     
@@ -302,15 +323,15 @@ export default function UniversalMorph({ onBack }) {
             ) : null}
             <h1 className="text-2xl font-bold text-white flex items-center gap-2">
               <ZapOff className="text-emerald-400" />
-              通用 SVG 变形引擎 V6 (全员聚合)
+              通用 SVG 变形引擎 V6 (Anime.js 4 Timeline)
             </h1>
           </div>
           <p className="text-slate-400 text-xs mt-2 flex items-center gap-2">
-            <span className="text-emerald-400">Collapse & Split 策略</span>
+            <span className="text-emerald-400">Timeline Orchestration</span>
             <span className="w-1 h-1 bg-slate-600 rounded-full"></span>
-            <span>所有元素参与变形</span>
+            <span>JSX 控制偏移</span>
             <span className="w-1 h-1 bg-slate-600 rounded-full"></span>
-            <span>整数坐标 + 动态LOD优化</span>
+            <span>背景缩放联动</span>
           </p>
         </div>
         
@@ -336,7 +357,7 @@ export default function UniversalMorph({ onBack }) {
                : 'bg-emerald-500 text-slate-900 hover:bg-emerald-400 hover:scale-105 shadow-lg shadow-emerald-500/20'
             }`}
           >
-            {isPlaying ? 'Morphing...' : <><Play size={16} fill="currentColor"/> Run Morph</>}
+            {isPlaying ? 'Morphing...' : <><Play size={16} fill="currentColor"/> Run Timeline</>}
           </button>
         </div>
       </div>
@@ -404,7 +425,8 @@ export default function UniversalMorph({ onBack }) {
 
         {/* 右侧：舞台 */}
         <div className="lg:w-[500px] flex flex-col items-center sticky top-24 h-fit">
-          <div className="relative w-full aspect-square bg-slate-900/50 rounded-2xl border border-slate-800 flex items-center justify-center shadow-2xl backdrop-blur-sm overflow-hidden">
+          {/* 添加 ref 到 container 以便 Timeline 控制 */}
+          <div ref={containerRef} className="relative w-full aspect-square bg-slate-900/50 rounded-2xl border border-slate-800 flex items-center justify-center shadow-2xl backdrop-blur-sm overflow-hidden">
              
              <div className="absolute inset-0 opacity-20 pointer-events-none" 
                   style={{
@@ -433,7 +455,7 @@ export default function UniversalMorph({ onBack }) {
 
           <div className="w-full mt-6 bg-slate-900 rounded-xl p-4 border border-slate-800">
               <h4 className="text-xs font-bold text-slate-400 mb-3 flex items-center gap-2">
-                  <Cpu size={12}/> V6 全员聚合统计
+                  <Cpu size={12}/> V6 Anime.js Timeline 统计
               </h4>
               <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="bg-slate-950 rounded p-2">
@@ -441,12 +463,12 @@ export default function UniversalMorph({ onBack }) {
                       <div className="text-sm font-mono text-emerald-400">{maxPaths}</div>
                   </div>
                    <div className="bg-slate-950 rounded p-2">
-                      <div className="text-[10px] text-slate-500">渲染策略</div>
-                      <div className="text-sm font-mono text-blue-400">Collapse/Split</div>
+                      <div className="text-[10px] text-slate-500">控制方式</div>
+                      <div className="text-sm font-mono text-blue-400">External Timeline</div>
                   </div>
                   <div className="bg-slate-950 rounded p-2">
-                      <div className="text-[10px] text-slate-500">采样精度</div>
-                      <div className="text-sm font-mono text-purple-400">{staticSamples}点</div>
+                      <div className="text-[10px] text-slate-500">Timeline Offset</div>
+                      <div className="text-sm font-mono text-purple-400">200ms</div>
                   </div>
               </div>
           </div>
