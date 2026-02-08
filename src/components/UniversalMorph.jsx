@@ -5,6 +5,12 @@ import {
   Thermometer, Activity, Cpu, Globe, Anchor, Box, Sparkles, Gauge,
   Wind, ZapOff
 } from 'lucide-react';
+import {
+  buildStaticPathD,
+  createColorLerp,
+  createMorphEngine,
+  createMorphInterpolator
+} from '../lib/svgMorphEngine.js';
 
 // --- 1. 复杂路径生成器 ---
 
@@ -103,32 +109,6 @@ const generateSwarm = (count) => {
   return paths;
 };
 
-// --- 2. 辅助函数 ---
-
-const hexToRgb = (hex) => {
-  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : [0, 0, 0];
-};
-
-const prepColorLerp = (color1, color2) => {
-  const [r1, g1, b1] = hexToRgb(color1);
-  const [r2, g2, b2] = hexToRgb(color2);
-  return {
-    start: [r1, g1, b1],
-    diff: [r2 - r1, g2 - g1, b2 - b1]
-  };
-};
-
-const fastLerpColor = (c, factor) => {
-  // 使用位运算取整 (x | 0) 比 Math.round 快
-  const r = (c.start[0] + c.diff[0] * factor) | 0;
-  const g = (c.start[1] + c.diff[1] * factor) | 0;
-  const b = (c.start[2] + c.diff[2] * factor) | 0;
-  return `rgb(${r},${g},${b})`; 
-};
-
 // --- 3. 图形库 ---
 const SHAPE_LIBRARY = {
   basic: {
@@ -171,46 +151,6 @@ Object.values(SHAPE_LIBRARY).forEach(category => {
   });
 });
 
-// --- 4. 核心算法 ---
-// 性能优化: 对于海量元素，不进行旋转对齐，直接使用原始点序
-const findBestOffset = (pointsA, pointsB, samples, isMassive) => {
-  if (isMassive) return 0;
-
-  const len = pointsA.length;
-  let minTotalDist = Infinity;
-  let bestOffset = 0;
-  // 采样步长加大，只计算大概趋势
-  const step = Math.max(1, Math.floor(samples / 20));
-
-  for (let offset = 0; offset < len; offset += step) {
-    let currentTotalDist = 0;
-    const distStep = Math.max(1, Math.floor(samples / 15));
-    for (let i = 0; i < len; i += distStep) {
-      const pA = pointsA[i];
-      const pB = pointsB[(i + offset) % len];
-      currentTotalDist += (pA.x - pB.x) ** 2 + (pA.y - pB.y) ** 2;
-    }
-    if (currentTotalDist < minTotalDist) {
-      minTotalDist = currentTotalDist;
-      bestOffset = offset;
-    }
-  }
-  return bestOffset;
-};
-
-const samplePath = (pathString, sampleCount) => {
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", pathString);
-  const len = path.getTotalLength();
-  const points = [];
-  for (let i = 0; i < sampleCount; i++) {
-    const p = i / sampleCount;
-    const pt = path.getPointAtLength(len * p);
-    points.push({ x: pt.x, y: pt.y });
-  }
-  return points;
-};
-
 // --- 5. 路径组件 (纯粹的占位符与注册器) ---
 const MorphingPath = ({ 
   startD, endD, startColor, endColor, 
@@ -222,26 +162,16 @@ const MorphingPath = ({
 
   // 预计算几何数据
   const interpolator = useMemo(() => {
-    if (!startD || !endD) return null;
-    const pointsA = samplePath(startD, samples);
-    const pointsB_Raw = samplePath(endD, samples);
-    let pointsB_Final = pointsB_Raw;
-
-    if (optimize) {
-      const offset = findBestOffset(pointsA, pointsB_Raw, samples, isMassive);
-      if (offset !== 0) {
-        pointsB_Final = [
-          ...pointsB_Raw.slice(offset),
-          ...pointsB_Raw.slice(0, offset)
-        ];
-      }
-    }
-    return { a: pointsA, b: pointsB_Final };
+    return createMorphInterpolator(startD, endD, {
+      samples,
+      optimize,
+      isMassive
+    });
   }, [startD, endD, optimize, samples, isMassive]);
 
   // 预计算颜色数据
   const colorData = useMemo(() => {
-    return prepColorLerp(startColor, endColor);
+    return createColorLerp(startColor, endColor);
   }, [startColor, endColor]);
 
   // 注册到主循环
@@ -260,14 +190,8 @@ const MorphingPath = ({
   // 初始静态渲染
   const initialD = useMemo(() => {
     if (!interpolator) return "";
-    let d = "M";
-    const { a } = interpolator;
-    for (let i = 0; i < samples; i++) {
-       d += `${a[i].x.toFixed(1)},${a[i].y.toFixed(1)}L`; 
-    }
-    d = d.slice(0, -1) + "Z";
-    return d;
-  }, [interpolator, samples]);
+    return buildStaticPathD(interpolator.a, 1);
+  }, [interpolator]);
 
   return (
     <path 
@@ -292,14 +216,13 @@ export default function UniversalMorph() {
   const [optimize, setOptimize] = useState(true);
   const [perfThrottle, setPerfThrottle] = useState(true);
   
-  const progressRef = useRef(0);
-  const registryRef = useRef(new Map());
-  const frameCountRef = useRef(0);
+  const engineRef = useRef(null);
+  if (!engineRef.current) {
+    engineRef.current = createMorphEngine({ duration: 2000 });
+  }
 
   const handleRegister = useMemo(() => (item) => {
-    const id = Symbol();
-    registryRef.current.set(id, item);
-    return () => registryRef.current.delete(id);
+    return engineRef.current.register(item);
   }, []);
 
   const startData = ALL_SHAPES[startKey];
@@ -316,81 +239,27 @@ export default function UniversalMorph() {
   // 动画时的 LOD
   const motionSampleStep = isMassive ? 2 : 1; 
 
-  // 动画循环
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying) return undefined;
 
-    let startTime;
-    let reqId;
-    const duration = 2000; 
-    const shouldThrottle = perfThrottle && isMassive;
-    frameCountRef.current = 0;
-
-    const animate = (time) => {
-      if (!startTime) startTime = time;
-      
-      frameCountRef.current++;
-      if (shouldThrottle && frameCountRef.current % 2 !== 0) {
-        reqId = requestAnimationFrame(animate);
-        return;
-      }
-
-      const elapsed = time - startTime;
-      const t = Math.min(elapsed / duration, 1);
-      progressRef.current = t;
-
-      // Direct DOM Manipulation
-      registryRef.current.forEach(({ dom, data, color, samples }) => {
-        const { a, b } = data;
-        let d = "M";
-        
-        // 核心优化: 整数坐标 + 动态LOD
-        for (let i = 0; i < samples; i += motionSampleStep) {
-          const x = a[i].x + (b[i].x - a[i].x) * t;
-          const y = a[i].y + (b[i].y - a[i].y) * t;
-          d += `${(x + 0.5) | 0},${(y + 0.5) | 0}L`;
-        }
-        d = d.slice(0, -1) + "Z";
-        
-        const curColor = fastLerpColor(color, t);
-        dom.setAttribute('d', d);
-        dom.setAttribute('fill', curColor);
-        dom.setAttribute('stroke', curColor);
-      });
-
-      if (t < 1) {
-        reqId = requestAnimationFrame(animate);
-      } else {
+    const stopAnimation = engineRef.current.play({
+      shouldThrottle: perfThrottle && isMassive,
+      motionSampleStep,
+      onComplete: () => {
         setIsPlaying(false);
-        // 动画结束，恢复全精度静态画面
-        handleReset(true); 
+        handleReset(true);
       }
-    };
+    });
 
-    reqId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(reqId);
-  }, [isPlaying, isMassive, perfThrottle]);
+    return () => {
+      stopAnimation?.();
+      engineRef.current.stop();
+    };
+  }, [isPlaying, isMassive, perfThrottle, motionSampleStep]);
 
   const handleReset = (resetToFinal = false) => {
-    const t = resetToFinal ? 1 : 0;
-    progressRef.current = t;
     setIsPlaying(false);
-    
-    registryRef.current.forEach(({ dom, data, color, samples }) => {
-        const { a, b } = data;
-        const target = resetToFinal ? b : a;
-        
-        let d = "M";
-        for (let i = 0; i < samples; i++) {
-           d += `${target[i].x.toFixed(1)},${target[i].y.toFixed(1)}L`;
-        }
-        d = d.slice(0, -1) + "Z";
-        
-        const c = fastLerpColor(color, t);
-        dom.setAttribute('d', d);
-        dom.setAttribute('fill', c);
-        dom.setAttribute('stroke', c);
-    });
+    engineRef.current.renderStatic(resetToFinal ? 1 : 0, 1);
   };
 
   const handlePlay = () => {

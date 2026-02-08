@@ -53,12 +53,15 @@ SVG 的 d 属性指令各不相同（如 C 曲线对 L 直线）。为了实现�
 - 收益：大幅降低 CPU 占用率，防止主线程阻塞导致浏览器无响应。
 
 ## 🛠 代码结构
-- UniversalMorph.jsx: 主文件，包含所有逻辑。
+- src/lib/svgMorphEngine.js: 独立的 SVG morph 引擎模块。
+  - samplePath / createMorphInterpolator: 路径采样与对齐。
+  - createColorLerp / lerpColor: 颜色插值。
+  - buildStaticPathD / buildAnimatedPathD: 路径字符串构建。
+  - createMorphEngine: 动画驱动与注册管理。
+- UniversalMorph.jsx: 主组件，负责 UI 交互与引擎接入。
   - generate*: 各种复杂 SVG 路径生成器（城市、花朵、矩阵等）。
   - SHAPE_LIBRARY: 预设的图形数据仓库。
-  - findBestOffset: 寻找最佳旋转角度的算法（含步长优化）。
   - MorphingPath: 单个路径组件，负责初始化数据和注册 DOM 引用。
-  - UniversalMorph: 主组件，负责动画循环、时间管理和全局渲染调度。
  
 ## 📦 如何使用
 本项目已整理为可直接运行的 Vite + React 应用（UI 依赖 Tailwind CDN 与 lucide-react 图标库）。
@@ -85,6 +88,26 @@ function App() {
     </div>
   );
 }
+```
+
+### 4. 引擎模块复用
+如果你只需要核心算法与动画驱动，可以单独引入引擎模块：
+```js
+import {
+  createMorphEngine,
+  createMorphInterpolator,
+  createColorLerp,
+  buildStaticPathD
+} from './lib/svgMorphEngine';
+
+const engine = createMorphEngine({ duration: 2000 });
+const interpolator = createMorphInterpolator(startD, endD, {
+  samples: 120,
+  optimize: true
+});
+const color = createColorLerp('#3B82F6', '#F59E0B');
+
+// 注册 DOM 节点后即可调用 engine.play / engine.renderStatic
 ```
 
 ## 🔮 未来展望
