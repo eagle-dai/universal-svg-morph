@@ -209,12 +209,9 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     timeline.add(progress, animOptions, offset);
   };
 
-  const stop = () => {};
-
   return {
     register,
     renderStatic,
     play,
-    stop,
   };
 };

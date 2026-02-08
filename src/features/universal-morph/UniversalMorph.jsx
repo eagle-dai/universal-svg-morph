@@ -351,14 +351,12 @@ export default function UniversalMorph({ onBack }) {
   // Cleanup
   useEffect(() => {
     return () => {
-      engineRef.current.stop();
       if (timelineRef.current) timelineRef.current.pause();
     };
   }, []);
 
   const handleReset = (resetToFinal = false) => {
     if (timelineRef.current) timelineRef.current.pause();
-    engineRef.current.stop();
     engineRef.current.renderStatic(resetToFinal ? 1 : 0, 1);
     setIsPlaying(false);
   };
