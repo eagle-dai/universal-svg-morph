@@ -53,12 +53,14 @@ SVG 的 d 属性指令各不相同（如 C 曲线对 L 直线）。为了实现�
 - 收益：大幅降低 CPU 占用率，防止主线程阻塞导致浏览器无响应。
 
 ## 🛠 代码结构
+- src/data/menuItems.js: 入口菜单的 Tile 配置（标题、描述、主题色等）。
+- src/pages/EntryMenu.jsx: 新入口菜单页面，负责渲染功能入口。
 - src/lib/svgMorphEngine.js: 独立的 SVG morph 引擎模块。
   - samplePath / createMorphInterpolator: 路径采样与对齐。
   - createColorLerp / lerpColor: 颜色插值。
   - buildStaticPathD / buildAnimatedPathD: 路径字符串构建。
   - createMorphEngine: 动画驱动与注册管理。
-- UniversalMorph.jsx: 主组件，负责 UI 交互与引擎接入。
+- src/features/universal-morph/UniversalMorph.jsx: 变形引擎主组件，负责 UI 交互与引擎接入。
   - generate*: 各种复杂 SVG 路径生成器（城市、花朵、矩阵等）。
   - SHAPE_LIBRARY: 预设的图形数据仓库。
   - MorphingPath: 单个路径组件，负责初始化数据和注册 DOM 引用。
@@ -76,10 +78,13 @@ yarn install
 yarn dev
 ```
 
-### 3. 组件入口
+### 3. 入口菜单
+应用入口现在是一个菜单页面，默认展示可用的演示入口。你可以在 `src/data/menuItems.js` 中继续添加新的 Tile 配置。 
+
+### 4. 组件入口
 如果你想在别的项目中复用，可以直接引入组件：
 ```js
-import UniversalMorph from './components/UniversalMorph';
+import UniversalMorph from './features/universal-morph/UniversalMorph';
 
 function App() {
   return (

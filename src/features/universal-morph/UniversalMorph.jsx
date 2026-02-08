@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react';
 import { 
-  Play, Pause, Grid, Menu, X, Circle, Settings2, Zap, Layers, 
+  ArrowLeft, Play, Pause, Grid, Menu, X, Circle, Settings2, Zap, Layers, 
   Home, Cloud, Smile, Bot, Ghost, Grip, Feather, Hexagon, Aperture, 
   Thermometer, Activity, Cpu, Globe, Anchor, Box, Sparkles, Gauge,
   Wind, ZapOff
@@ -10,7 +10,7 @@ import {
   createColorLerp,
   createMorphEngine,
   createMorphInterpolator
-} from '../lib/svgMorphEngine.js';
+} from '../../lib/svgMorphEngine.js';
 
 // --- 1. 复杂路径生成器 ---
 
@@ -209,7 +209,7 @@ const MorphingPath = ({
 };
 
 // --- 6. 主应用 ---
-export default function UniversalMorph() {
+export default function UniversalMorph({ onBack }) {
   const [startKey, setStartKey] = useState('menu');
   const [endKey, setEndKey] = useState('grid225'); 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -291,11 +291,23 @@ export default function UniversalMorph() {
       {/* Header */}
       <div className="bg-slate-900 border-b border-slate-800 p-6 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-xl">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <ZapOff className="text-emerald-400" />
-            通用 SVG 变形引擎 V6 (全员聚合)
-          </h1>
-          <p className="text-slate-400 text-xs mt-1 flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            {onBack ? (
+              <button
+                type="button"
+                onClick={onBack}
+                className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-200 transition hover:border-emerald-500/60 hover:text-emerald-300"
+              >
+                <ArrowLeft size={14} />
+                返回菜单
+              </button>
+            ) : null}
+            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+              <ZapOff className="text-emerald-400" />
+              通用 SVG 变形引擎 V6 (全员聚合)
+            </h1>
+          </div>
+          <p className="text-slate-400 text-xs mt-2 flex items-center gap-2">
             <span className="text-emerald-400">Collapse & Split 策略</span>
             <span className="w-1 h-1 bg-slate-600 rounded-full"></span>
             <span>所有元素参与变形</span>
