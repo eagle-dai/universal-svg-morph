@@ -15,45 +15,84 @@ export const samplePath = (pathString, sampleCount) => {
   return points;
 };
 
+// 修改：现在返回 { offset, score } 对象，而不仅仅是 offset
 export const findBestOffset = (pointsA, pointsB, samples, isMassive) => {
-  if (isMassive) return 0;
+  // 海量元素模式下跳过计算以保证性能，返回无穷大分数
+  if (isMassive) return { offset: 0, score: Infinity };
 
   const len = pointsA.length;
   let minTotalDist = Infinity;
   let bestOffset = 0;
+
+  // 采样步长优化：不需要每个点都算，跳着算以提升性能
   const step = Math.max(1, Math.floor(samples / 20));
 
   for (let offset = 0; offset < len; offset += step) {
     let currentTotalDist = 0;
+    // 距离计算步长优化
     const distStep = Math.max(1, Math.floor(samples / 15));
+
     for (let i = 0; i < len; i += distStep) {
       const pA = pointsA[i];
       const pB = pointsB[(i + offset) % len];
+      // 计算欧几里得距离的平方和（不开根号以提升性能）
       currentTotalDist += (pA.x - pB.x) ** 2 + (pA.y - pB.y) ** 2;
     }
+
     if (currentTotalDist < minTotalDist) {
       minTotalDist = currentTotalDist;
       bestOffset = offset;
     }
   }
-  return bestOffset;
+
+  return { offset: bestOffset, score: minTotalDist };
 };
 
+// 修改：增加了反向路径检测逻辑
 export const createMorphInterpolator = (startD, endD, options = {}) => {
   const { samples = 120, optimize = true, isMassive = false } = options;
 
   if (!startD || !endD) return null;
-  const pointsA = samplePath(startD, samples);
-  const pointsBRaw = samplePath(endD, samples);
-  let pointsBFinal = pointsBRaw;
 
-  if (optimize) {
-    const offset = findBestOffset(pointsA, pointsBRaw, samples, isMassive);
-    if (offset !== 0) {
+  // 1. 采样原始路径
+  const pointsA = samplePath(startD, samples);
+  const pointsB_Normal = samplePath(endD, samples);
+
+  let pointsBFinal = pointsB_Normal;
+
+  if (optimize && !isMassive) {
+    // 2. 准备反向路径数据（解决顺时针 vs 逆时针问题）
+    const pointsB_Reversed = [...pointsB_Normal].reverse();
+
+    // 3. 分别计算 正向 和 反向 的最佳匹配分数
+    const resNormal = findBestOffset(
+      pointsA,
+      pointsB_Normal,
+      samples,
+      isMassive,
+    );
+    const resReverse = findBestOffset(
+      pointsA,
+      pointsB_Reversed,
+      samples,
+      isMassive,
+    );
+
+    // 4. 决策：谁的距离总和更小，就用谁
+    // 如果反向的分数更低，说明路径方向是反的，我们需要翻转它
+    const useReverse = resReverse.score < resNormal.score;
+
+    const bestResult = useReverse ? resReverse : resNormal;
+    const targetPointsRaw = useReverse ? pointsB_Reversed : pointsB_Normal;
+
+    // 5. 应用最佳偏移量 (Shift)，对齐起始点
+    if (bestResult.offset !== 0) {
       pointsBFinal = [
-        ...pointsBRaw.slice(offset),
-        ...pointsBRaw.slice(0, offset),
+        ...targetPointsRaw.slice(bestResult.offset),
+        ...targetPointsRaw.slice(0, bestResult.offset),
       ];
+    } else {
+      pointsBFinal = targetPointsRaw;
     }
   }
 
@@ -157,12 +196,6 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
       });
     };
 
-    // [Fix]: 删除了 renderFrame(0) 的立即调用。
-    // 这解决了当 timeline 存在 offset 时，图形会立即跳变为第0帧（低精度/整数坐标）
-    // 导致在 offset 等待期间出现视觉跳动的问题。
-    // 现在的逻辑是：直到 timeline 真正更新到这个节点，onUpdate 才会触发渲染。
-
-    // 2. 动画参数
     const animOptions = {
       value: 1,
       duration: duration,
@@ -178,10 +211,8 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     };
 
     if (timeline) {
-      // Anime.js v4 语法 timeline.add(targets, options, offset)
       timeline.add(progress, animOptions, offset);
     } else {
-      // Anime.js v4 语法 animate(targets, options)
       activeAnimation = animate(progress, animOptions);
       return () => activeAnimation?.pause();
     }
