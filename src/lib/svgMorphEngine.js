@@ -133,13 +133,12 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     });
   };
 
-  const play = ({ 
-    motionSampleStep = 1, 
-    onComplete, 
+  const play = ({
+    motionSampleStep = 1,
+    onComplete,
     timeline = null,
-    offset = 0 
+    offset = 0,
   } = {}) => {
-    
     // 如果有正在运行的独立动画，先停止
     if (activeAnimation && !timeline) {
       activeAnimation.pause();
@@ -149,13 +148,13 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
 
     // 渲染帧逻辑
     const renderFrame = (t) => {
-       registry.forEach(({ dom, data, color }) => {
-          const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
-          const curColor = lerpColor(color, t);
-          dom.setAttribute("d", d);
-          dom.setAttribute("fill", curColor);
-          dom.setAttribute("stroke", curColor);
-        });
+      registry.forEach(({ dom, data, color }) => {
+        const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
+        const curColor = lerpColor(color, t);
+        dom.setAttribute("d", d);
+        dom.setAttribute("fill", curColor);
+        dom.setAttribute("stroke", curColor);
+      });
     };
 
     // 1. 立即渲染第 0 帧（防止闪烁）
@@ -165,7 +164,7 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
     const animOptions = {
       value: 1,
       duration: duration,
-      easing: 'linear', 
+      easing: "linear",
       onUpdate: () => {
         const t = Math.min(progress.value, 1);
         renderFrame(t);
@@ -173,18 +172,16 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
       onComplete: () => {
         renderFrame(1);
         onComplete?.();
-      }
+      },
     };
 
     if (timeline) {
-      // 关键修复：Anime.js v4 语法 timeline.add(targets, options, offset)
-      // 必须把 progress 作为第一个参数单独传入
+      // Anime.js v4 语法 timeline.add(targets, options, offset) 必须把 progress 作为第一个参数单独传入
       timeline.add(progress, animOptions, offset);
-      
+
       // 注意：Timeline 模式不需要在这里返回 stop，由 timeline 实例控制
     } else {
-      // 关键修复：Anime.js v4 语法 animate(targets, options)
-      // 必须把 progress 作为第一个参数单独传入
+      // Anime.js v4 语法 animate(targets, options) 必须把 progress 作为第一个参数单独传入
       activeAnimation = animate(progress, animOptions);
       return () => activeAnimation?.pause();
     }
