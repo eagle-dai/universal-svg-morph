@@ -852,7 +852,7 @@ export default function UniversalMorph({ onBack }) {
 
             <svg
               viewBox="0 0 200 200"
-              className="w-full h-full overflow-visible relative z-10 p-8"
+              className="w-full h-full overflow-visible relative z-10 p-10"
               style={{ filter: "drop-shadow(0 0 15px rgba(0,0,0,0.5))" }}
             >
               {renderItems.map((item) => (
