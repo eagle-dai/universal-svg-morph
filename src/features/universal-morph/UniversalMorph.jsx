@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import {
   ArrowLeft,
+  ArrowLeftRight,
   Play,
   Grid,
   Menu,
@@ -608,6 +609,14 @@ export default function UniversalMorph({ onBack }) {
     tl.play();
   };
 
+  const handleSwap = () => {
+    const nextStart = endKey;
+    const nextEnd = startKey;
+    setStartKey(nextStart);
+    setEndKey(nextEnd);
+    handleReset(false);
+  };
+
   const renderItems = Array.from({ length: maxPaths }).map((_, i) => {
     const sIndex = i % startData.paths.length;
     const eIndex = i % endData.paths.length;
@@ -668,6 +677,14 @@ export default function UniversalMorph({ onBack }) {
           >
             <Settings2 size={14} />
             {optimize ? "智能对齐: ON" : "智能对齐: OFF"}
+          </button>
+
+          <button
+            onClick={handleSwap}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border bg-slate-800 border-slate-700 text-slate-200 hover:border-blue-400/70 hover:text-blue-300"
+          >
+            <ArrowLeftRight size={14} />
+            切换 Src / Dest
           </button>
 
           <button
