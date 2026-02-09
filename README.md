@@ -62,6 +62,7 @@ SVG 的 d 属性指令各不相同（如 C 曲线对 L 直线）。为了实现�
 
 - src/data/menuItems.js: 入口菜单的 Tile 配置（标题、描述、主题色等）。
 - src/pages/EntryMenu.jsx: 新入口菜单页面，负责渲染功能入口。
+- src/features/basic-morph/BasicMorphTest.jsx: 基础 Morph 测试页，提供最小化的路径与 transform 验证场景。
 - src/lib/svgMorphEngine.js: 独立的 SVG morph 引擎模块，动画驱动改由 anime.js 4.x 负责调度。
   - samplePath: 路径采样。
   - findBestOffset: **[V6]** 计算最佳旋转偏移量与匹配分数（双向检测）。
@@ -93,7 +94,13 @@ yarn dev
 
 ### 3. 入口菜单
 
-应用入口现在是一个菜单页面，默认展示可用的演示入口。当前包括通用 SVG 变形引擎演示与 Infographic SVG 测试占位页。你可以在 `src/data/menuItems.js` 中继续添加新的 Tile 配置。
+应用入口现在是一个菜单页面，默认展示可用的演示入口。当前包括：
+
+- 基础 Morph 测试页：最小化示例，验证路径与 transform 的 morph 效果。
+- 通用 SVG 变形引擎演示：多形状、多元素路径的高性能 morph。
+- Infographic SVG 形态页：基于 AntV Infographic 的示例占位页。
+
+你可以在 `src/data/menuItems.js` 中继续添加新的 Tile 配置。
 
 ### 4. 组件入口
 
