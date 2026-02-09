@@ -257,7 +257,7 @@ const buildHierarchyRoot = (count) => ({
   children: buildDefaultItems(Math.max(2, count), '子节点')
 });
 
-const buildData = (templateId, count) => {
+const buildInfographicData = (templateId, count) => {
   const items = buildDefaultItems(count);
   const prefix = templateId.split('-')[0];
   const base = {
@@ -391,7 +391,7 @@ export const getInfographicLibrary = () => {
       console.warn(`Template not found: ${spec.templateId}`);
       return null;
     }
-    const data = buildData(spec.templateId, spec.itemCount);
+    const data = buildInfographicData(spec.templateId, spec.itemCount);
     const { paths, colors, viewBox } = renderTemplate(
       spec.templateId,
       data,
@@ -419,4 +419,12 @@ export const getInfographicLibrary = () => {
   return cachedLibrary;
 };
 
-export { DEFAULT_VIEWBOX, MORPH_DEFAULTS, VIEWBOX_SIZE };
+export const INFOGRAPHIC_TEMPLATES = TEMPLATE_SPECS;
+
+export {
+  DEFAULT_VIEWBOX,
+  FALLBACK_PALETTE,
+  MORPH_DEFAULTS,
+  VIEWBOX_SIZE,
+  buildInfographicData
+};
