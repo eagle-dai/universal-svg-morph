@@ -3,6 +3,11 @@ import { Infographic, getPalette, getTemplate } from '@antv/infographic';
 const VIEWBOX_SIZE = 200;
 const DEFAULT_VIEWBOX = `0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`;
 const FALLBACK_PALETTE = ['#1783FF', '#00C9C9', '#F0884D', '#D580FF'];
+const MORPH_DEFAULTS = {
+  separateByDefault: true,
+  separationOffset: 54,
+  previewWidth: 690
+};
 
 const TEMPLATE_SPECS = [
   {
@@ -414,4 +419,4 @@ export const getInfographicLibrary = () => {
   return cachedLibrary;
 };
 
-export { DEFAULT_VIEWBOX, VIEWBOX_SIZE };
+export { DEFAULT_VIEWBOX, MORPH_DEFAULTS, VIEWBOX_SIZE };
