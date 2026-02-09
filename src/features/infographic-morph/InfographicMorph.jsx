@@ -7,6 +7,11 @@ import {
   Wand2
 } from 'lucide-react';
 import {
+  Infographic,
+  getPalette,
+  getTemplate
+} from '@antv/infographic';
+import {
   memo,
   useEffect,
   useLayoutEffect,
@@ -23,7 +28,10 @@ import {
 } from '../../lib/svgMorphEngine.js';
 import {
   DEFAULT_VIEWBOX,
+  FALLBACK_PALETTE,
   getInfographicLibrary,
+  INFOGRAPHIC_TEMPLATES,
+  buildInfographicData,
   MORPH_DEFAULTS
 } from './infographicLibrary.js';
 
@@ -105,75 +113,83 @@ const MorphingPath = memo(
   }
 );
 
-const MiniPreview = memo(({ paths, colors, viewBox }) => {
-  return (
-    <svg viewBox={viewBox} className="h-full w-full">
-      {paths.map((path, index) => (
-        <path
-          key={`${path}-${index}`}
-          d={path}
-          fill={colors[index % colors.length]}
-          stroke={colors[index % colors.length]}
-          strokeWidth={1}
-          fillOpacity={0.9}
-        />
-      ))}
-    </svg>
-  );
-});
-
 const StatPill = ({ label, value }) => (
   <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
     {label} <span className="text-slate-900">{value}</span>
   </div>
 );
 
-const InfographicCard = ({ data, active, onClick, activeClass }) => {
-  return (
-    <button
-      type="button"
-      onClick={() => onClick(data.id)}
-      className={`flex w-full flex-col gap-3 rounded-2xl border px-4 py-3 text-left transition ${
-        active
-          ? activeClass
-          : 'border-slate-200 bg-white/80 hover:border-slate-300'
-      }`}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-xs font-semibold text-slate-900">
-            {data.title}
+const PreviewCard = memo(
+  ({ templateId, title, description, tags, data, active, onClick, activeClass }) => {
+    const containerRef = useRef(null);
+
+    const palette = useMemo(
+      () => getPalette('antv') ?? FALLBACK_PALETTE,
+      []
+    );
+
+    useEffect(() => {
+      if (!containerRef.current) return undefined;
+
+      const container = containerRef.current;
+      container.innerHTML = '';
+
+      const infographic = new Infographic({
+        container,
+        template: templateId,
+        data,
+        width: 260,
+        height: 200,
+        padding: 10,
+        themeConfig: {
+          palette
+        }
+      });
+
+      infographic.render();
+
+      return () => {
+        infographic.destroy();
+        container.innerHTML = '';
+      };
+    }, [data, palette, templateId]);
+
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`flex h-full flex-col gap-4 rounded-2xl border p-5 text-left shadow-sm transition ${
+          active
+            ? activeClass
+            : 'border-slate-200 bg-white hover:border-slate-300'
+        }`}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+            <p className="mt-1 text-xs text-slate-500">{description}</p>
           </div>
-          <div className="mt-1 text-[11px] text-slate-600">
-            {data.description}
+          <div className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+            {templateId}
           </div>
         </div>
-        <div className="h-14 w-14 rounded-xl border border-slate-200 bg-slate-50 p-2">
-          <MiniPreview
-            paths={data.paths}
-            colors={data.colors}
-            viewBox={data.viewBox || DEFAULT_VIEWBOX}
-          />
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600"
+            >
+              {tag}
+            </span>
+          ))}
         </div>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {data.tags.map((tag) => (
-          <span
-            key={tag}
-            className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2 text-[10px] text-slate-500">
-        <span>层级 {data.stats.layers}</span>
-        <span>节点 {data.stats.nodes}</span>
-        <span>块 {data.stats.blocks}</span>
-      </div>
-    </button>
-  );
-};
+        <div className="flex flex-1 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
+          <div ref={containerRef} className="h-[200px] w-[260px]" />
+        </div>
+      </button>
+    );
+  }
+);
 
 const parseViewBox = (value) => {
   if (!value) return null;
@@ -231,6 +247,17 @@ export default function InfographicMorph({ onBack }) {
 
   const handleRegister = useMemo(
     () => (item) => engineRef.current.register(item),
+    []
+  );
+
+  const previewTemplates = useMemo(
+    () =>
+      INFOGRAPHIC_TEMPLATES.filter((spec) => getTemplate(spec.templateId)).map(
+        (spec) => ({
+          ...spec,
+          data: buildInfographicData(spec.templateId, spec.itemCount)
+        })
+      ),
     []
   );
 
@@ -434,8 +461,8 @@ export default function InfographicMorph({ onBack }) {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-[1192px] flex-1 flex-col gap-6 px-6 py-10 lg:flex-row">
-        <section className="flex-1 space-y-6">
+      <main className="mx-auto flex w-full max-w-[1360px] flex-1 flex-col gap-8 px-6 py-10 lg:flex-row lg:flex-wrap xl:flex-nowrap">
+        <section className="min-w-0 flex-1 space-y-6">
           <div className="grid gap-10 lg:grid-cols-2">
             <div className="space-y-3">
               <div className="sticky top-0 z-10 bg-slate-50 pb-2">
@@ -443,14 +470,18 @@ export default function InfographicMorph({ onBack }) {
                   源模板
                 </div>
               </div>
-              <div className="space-y-4">
-                {infographicLibrary.map((item) => (
-                  <InfographicCard
+              <div className="grid gap-6">
+                {previewTemplates.map((item) => (
+                  <PreviewCard
                     key={`start-${item.id}`}
-                    data={item}
+                    templateId={item.templateId}
+                    title={item.title}
+                    description={item.description}
+                    tags={item.tags}
+                    data={item.data}
                     active={startId === item.id}
-                    onClick={(id) => {
-                      setStartId(id);
+                    onClick={() => {
+                      setStartId(item.id);
                       handleReset(false);
                     }}
                     activeClass="border-amber-400/70 bg-amber-50 ring-1 ring-amber-200"
@@ -464,14 +495,18 @@ export default function InfographicMorph({ onBack }) {
                   目标模板
                 </div>
               </div>
-              <div className="space-y-4">
-                {infographicLibrary.map((item) => (
-                  <InfographicCard
+              <div className="grid gap-6">
+                {previewTemplates.map((item) => (
+                  <PreviewCard
                     key={`end-${item.id}`}
-                    data={item}
+                    templateId={item.templateId}
+                    title={item.title}
+                    description={item.description}
+                    tags={item.tags}
+                    data={item.data}
                     active={endId === item.id}
-                    onClick={(id) => {
-                      setEndId(id);
+                    onClick={() => {
+                      setEndId(item.id);
                       handleReset(false);
                     }}
                     activeClass="border-blue-400/70 bg-blue-50 ring-1 ring-blue-200"
@@ -483,7 +518,7 @@ export default function InfographicMorph({ onBack }) {
         </section>
 
         <aside
-          className="flex w-full flex-col gap-6"
+          className="flex w-full flex-col gap-6 lg:sticky lg:top-28 lg:self-start"
           style={{ width: `min(100%, ${MORPH_DEFAULTS.previewWidth}px)` }}
         >
           <div
