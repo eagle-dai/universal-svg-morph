@@ -387,9 +387,9 @@ export default function InfographicMorph({ onBack }) {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 py-10 lg:flex-row">
+      <main className="mx-auto flex w-full max-w-[1192px] flex-1 flex-col gap-6 px-6 py-10 lg:flex-row">
         <section className="flex-1 space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-10 lg:grid-cols-2">
             <div className="space-y-3">
               <div className="sticky top-0 z-10 bg-slate-950 pb-2">
                 <div className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300">
