@@ -238,7 +238,12 @@ export default function InfographicMorph({ onBack }) {
     MORPH_DEFAULTS.separateByDefault
   );
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showMorphPreview, setShowMorphPreview] = useState(false);
   const containerRef = useRef(null);
+  const leftPreviewRef = useRef(null);
+  const rightPreviewRef = useRef(null);
+  const morphLayerRef = useRef(null);
+  const morphTargetOffsetRef = useRef(0);
   const engineRef = useRef(null);
   const timelineRef = useRef(null);
 
@@ -292,14 +297,19 @@ export default function InfographicMorph({ onBack }) {
     }
     engineRef.current.renderStatic(resetToFinal ? 1 : 0, 1);
     setIsPlaying(false);
+    setShowMorphPreview(false);
   };
 
   const handlePlay = () => {
     setIsPlaying(true);
+    setShowMorphPreview(true);
     const tl = new Timeline({
       onComplete: () => {
         setIsPlaying(false);
         engineRef.current.renderStatic(1, 1);
+        if (morphLayerRef.current) {
+          morphLayerRef.current.style.transform = `translateX(${morphTargetOffsetRef.current}px)`;
+        }
       }
     });
     timelineRef.current = tl;
@@ -311,6 +321,35 @@ export default function InfographicMorph({ onBack }) {
           scale: [1, 0.96],
           duration: 240,
           easing: 'easeOutQuad'
+        },
+        0
+      );
+    }
+
+    if (
+      containerRef.current &&
+      leftPreviewRef.current &&
+      rightPreviewRef.current &&
+      morphLayerRef.current
+    ) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const leftRect = leftPreviewRef.current.getBoundingClientRect();
+      const rightRect = rightPreviewRef.current.getBoundingClientRect();
+      const containerCenter = containerRect.left + containerRect.width / 2;
+      const leftCenter = leftRect.left + leftRect.width / 2;
+      const rightCenter = rightRect.left + rightRect.width / 2;
+      const startOffset = leftCenter - containerCenter;
+      const endOffset = rightCenter - containerCenter;
+
+      morphTargetOffsetRef.current = endOffset;
+      morphLayerRef.current.style.transform = `translateX(${startOffset}px)`;
+
+      tl.add(
+        {
+          targets: morphLayerRef.current,
+          translateX: [startOffset, endOffset],
+          duration: 2200,
+          easing: 'easeInOutQuad'
         },
         0
       );
@@ -517,7 +556,10 @@ export default function InfographicMorph({ onBack }) {
               }}
             />
             <div className="relative z-10 flex h-full w-full items-center gap-12 p-8">
-              <div className="flex min-h-0 flex-1 flex-col gap-3 rounded-2xl border border-amber-400/20 bg-slate-950/40 p-4">
+              <div
+                ref={leftPreviewRef}
+                className="flex min-h-0 flex-1 flex-col gap-3 rounded-2xl border border-amber-400/20 bg-slate-950/40 p-4"
+              >
                 <div className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300">
                   源 SVG
                 </div>
@@ -529,7 +571,10 @@ export default function InfographicMorph({ onBack }) {
                   />
                 </div>
               </div>
-              <div className="flex min-h-0 flex-1 flex-col gap-3 rounded-2xl border border-blue-400/20 bg-slate-950/40 p-4">
+              <div
+                ref={rightPreviewRef}
+                className="flex min-h-0 flex-1 flex-col gap-3 rounded-2xl border border-blue-400/20 bg-slate-950/40 p-4"
+              >
                 <div className="text-xs font-semibold uppercase tracking-[0.3em] text-blue-300">
                   目标 SVG
                 </div>
@@ -543,8 +588,9 @@ export default function InfographicMorph({ onBack }) {
               </div>
             </div>
             <div
+              ref={morphLayerRef}
               className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-200 ${
-                isPlaying ? 'opacity-100' : 'opacity-0'
+                showMorphPreview ? 'opacity-100' : 'opacity-0'
               }`}
             >
               <svg
