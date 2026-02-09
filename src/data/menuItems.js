@@ -1,6 +1,21 @@
-import { Image, ZapOff } from 'lucide-react';
+import { Image, Waves, ZapOff } from 'lucide-react';
 
 export const MENU_ITEMS = [
+  {
+    id: 'basic-morph',
+    title: '基础 Morph 测试',
+    description: '快速验证源/目标路径与 transform 版本的 morph 效果。',
+    badge: '基础页',
+    cta: '进入测试',
+    icon: Waves,
+    theme: {
+      accent: 'cyan',
+      background: 'bg-cyan-500/10',
+      border: 'border-cyan-500/40',
+      text: 'text-cyan-200',
+      glow: 'shadow-cyan-500/30'
+    }
+  },
   {
     id: 'universal-morph',
     title: '通用 SVG 变形引擎 V6',
