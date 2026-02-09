@@ -173,10 +173,10 @@ const extractShapeColor = (element) => {
   return normalizeColor(computed.fill) || normalizeColor(computed.stroke);
 };
 
-const elementToPath = (element) => {
+const buildPathData = (element) => {
   const tag = element.tagName.toLowerCase();
   if (tag === 'path') {
-    return element.getAttribute('d');
+    return { d: element.getAttribute('d'), closed: /[zZ]\s*$/.test(element.getAttribute('d') ?? '') };
   }
   if (tag === 'rect') {
     const x = clampNumber(element.getAttribute('x'));
@@ -186,35 +186,69 @@ const elementToPath = (element) => {
     const rx = clampNumber(element.getAttribute('rx'));
     const ry = clampNumber(element.getAttribute('ry'));
     const radius = rx || ry;
-    return roundedRectPath(x, y, width, height, radius);
+    return { d: roundedRectPath(x, y, width, height, radius), closed: true };
   }
   if (tag === 'circle') {
     const cx = clampNumber(element.getAttribute('cx'));
     const cy = clampNumber(element.getAttribute('cy'));
     const r = clampNumber(element.getAttribute('r'));
-    return circlePath(cx, cy, r);
+    return { d: circlePath(cx, cy, r), closed: true };
   }
   if (tag === 'ellipse') {
     const cx = clampNumber(element.getAttribute('cx'));
     const cy = clampNumber(element.getAttribute('cy'));
     const rx = clampNumber(element.getAttribute('rx'));
     const ry = clampNumber(element.getAttribute('ry'));
-    return ellipsePath(cx, cy, rx, ry);
+    return { d: ellipsePath(cx, cy, rx, ry), closed: true };
   }
   if (tag === 'polygon') {
-    return polygonPath(parsePoints(element.getAttribute('points')));
+    return { d: polygonPath(parsePoints(element.getAttribute('points'))), closed: true };
   }
   if (tag === 'polyline') {
-    return polylinePath(parsePoints(element.getAttribute('points')));
+    return { d: polylinePath(parsePoints(element.getAttribute('points'))), closed: false };
   }
   if (tag === 'line') {
     const x1 = clampNumber(element.getAttribute('x1'));
     const y1 = clampNumber(element.getAttribute('y1'));
     const x2 = clampNumber(element.getAttribute('x2'));
     const y2 = clampNumber(element.getAttribute('y2'));
-    return `M ${x1} ${y1} L ${x2} ${y2}`;
+    return { d: `M ${x1} ${y1} L ${x2} ${y2}`, closed: false };
   }
-  return null;
+  return { d: null, closed: false };
+};
+
+const matrixFromCTM = (ctm) => {
+  if (!ctm) return new DOMMatrix();
+  return new DOMMatrix([ctm.a, ctm.b, ctm.c, ctm.d, ctm.e, ctm.f]);
+};
+
+const transformPoint = (matrix, point) => {
+  const transformed = new DOMPoint(point.x, point.y).matrixTransform(matrix);
+  return [transformed.x, transformed.y];
+};
+
+const pathFromElement = (element, fallbackSamples = 80) => {
+  const { d, closed } = buildPathData(element);
+  if (!d) return null;
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', d);
+  const length = path.getTotalLength();
+  if (!Number.isFinite(length) || length <= 0) return null;
+  const sampleCount = Math.min(
+    160,
+    Math.max(24, Math.round(length / 6) || fallbackSamples)
+  );
+  const matrix = matrixFromCTM(element.getCTM());
+  const points = [];
+  for (let i = 0; i < sampleCount; i += 1) {
+    const point = path.getPointAtLength((length * i) / (sampleCount - 1));
+    points.push(transformPoint(matrix, point));
+  }
+  if (!points.length) return null;
+  const pathD = `M ${points
+    .map(([x, y]) => `${x} ${y}`)
+    .join(' L ')}`;
+  return closed ? `${pathD} Z` : pathD;
 };
 
 const buildDefaultItems = (count, labelPrefix = '节点') =>
@@ -306,7 +340,7 @@ const extractPathsFromSvg = (svg, palette) => {
   const colorSet = new Set();
 
   shapes.forEach((element) => {
-    const path = elementToPath(element);
+    const path = pathFromElement(element);
     if (!path) return;
     paths.push(path);
     const color = extractShapeColor(element);
