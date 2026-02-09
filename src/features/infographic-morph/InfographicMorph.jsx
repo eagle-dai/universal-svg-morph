@@ -1,6 +1,7 @@
 import {
   ArrowLeft,
   ArrowLeftRight,
+  Layers,
   Play,
   Sparkles,
   Wand2
@@ -25,6 +26,16 @@ import {
   getInfographicLibrary
 } from './infographicLibrary.js';
 
+const DEMO_LAYOUT = {
+  separationOffset: 36
+};
+
+const offsetPoints = (points, dx = 0, dy = 0) =>
+  points.map((point) => ({
+    x: point.x + dx,
+    y: point.y + dy
+  }));
+
 const MorphingPath = memo(
   ({
     startD,
@@ -34,18 +45,28 @@ const MorphingPath = memo(
     optimize,
     samples,
     isMassive,
-    onRegister
+    onRegister,
+    separate,
+    separationOffset
   }) => {
     const pathRef = useRef(null);
 
     const interpolator = useMemo(
-      () =>
-        createMorphInterpolator(startD, endD, {
+      () => {
+        const baseInterpolator = createMorphInterpolator(startD, endD, {
           samples,
           optimize,
           isMassive
-        }),
-      [endD, isMassive, optimize, samples, startD]
+        });
+        if (!baseInterpolator || !separate) {
+          return baseInterpolator;
+        }
+        return {
+          a: offsetPoints(baseInterpolator.a, -separationOffset, 0),
+          b: offsetPoints(baseInterpolator.b, separationOffset, 0)
+        };
+      },
+      [endD, isMassive, optimize, samples, separate, separationOffset, startD]
     );
 
     const colorData = useMemo(
@@ -183,6 +204,14 @@ const mergeViewBox = (a, b) => {
   return `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
 };
 
+const expandViewBox = (value, offset) => {
+  const parsed = parseViewBox(value);
+  if (!parsed) return value;
+  return `${parsed.minX - offset} ${parsed.minY} ${parsed.width + offset * 2} ${
+    parsed.height
+  }`;
+};
+
 export default function InfographicMorph({ onBack }) {
   const { library: infographicLibrary, map: infographicMap } = useMemo(
     () => getInfographicLibrary(),
@@ -191,6 +220,7 @@ export default function InfographicMorph({ onBack }) {
   const [startId, setStartId] = useState(() => infographicLibrary[0]?.id);
   const [endId, setEndId] = useState(() => infographicLibrary[1]?.id);
   const [optimize, setOptimize] = useState(true);
+  const [separate, setSeparate] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const containerRef = useRef(null);
   const engineRef = useRef(null);
@@ -228,6 +258,9 @@ export default function InfographicMorph({ onBack }) {
     startData?.viewBox || DEFAULT_VIEWBOX,
     endData?.viewBox || DEFAULT_VIEWBOX
   );
+  const expandedViewBox = separate
+    ? expandViewBox(mergedViewBox, DEMO_LAYOUT.separationOffset)
+    : mergedViewBox;
 
   useEffect(() => {
     return () => {
@@ -356,6 +389,21 @@ export default function InfographicMorph({ onBack }) {
               </button>
               <button
                 type="button"
+                onClick={() => {
+                  setSeparate(!separate);
+                  handleReset(false);
+                }}
+                className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-bold transition-all ${
+                  separate
+                    ? 'border-blue-400/60 bg-blue-500/10 text-blue-300'
+                    : 'border-slate-700 bg-slate-800 text-slate-500'
+                }`}
+              >
+                <Layers size={14} />
+                {separate ? '源/目标分离: ON' : '源/目标分离: OFF'}
+              </button>
+              <button
+                type="button"
                 onClick={handleSwap}
                 className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-bold text-slate-200 transition hover:border-amber-400/70 hover:text-amber-200"
               >
@@ -450,7 +498,7 @@ export default function InfographicMorph({ onBack }) {
               }}
             />
             <svg
-              viewBox={mergedViewBox}
+              viewBox={expandedViewBox}
               className="relative z-10 h-full w-full p-10"
               style={{ filter: 'drop-shadow(0 0 18px rgba(0,0,0,0.5))' }}
             >
@@ -466,6 +514,8 @@ export default function InfographicMorph({ onBack }) {
                     samples={staticSamples}
                     isMassive={isMassive}
                     onRegister={handleRegister}
+                    separate={separate}
+                    separationOffset={DEMO_LAYOUT.separationOffset}
                   />
                 ) : null
               )}
