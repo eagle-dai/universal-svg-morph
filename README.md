@@ -73,6 +73,7 @@ SVG 的 d 属性指令各不相同（如 C 曲线对 L 直线）。为了实现�
   - generate\*: 各种复杂 SVG 路径生成器（城市、花朵、矩阵等）。
   - SHAPE_LIBRARY: 预设的图形数据仓库。
   - MorphingPath: 单个路径组件，负责初始化数据和注册 DOM 引用。
+- src/features/infographic-test/InfographicTest.jsx: Infographic SVG 测试页，占位用于接入 AntV Infographic 生成的 SVG 结果。
 
 ## 📦 如何使用
 
@@ -92,7 +93,7 @@ yarn dev
 
 ### 3. 入口菜单
 
-应用入口现在是一个菜单页面，默认展示可用的演示入口。你可以在 `src/data/menuItems.js` 中继续添加新的 Tile 配置。
+应用入口现在是一个菜单页面，默认展示可用的演示入口。当前包括通用 SVG 变形引擎演示与 Infographic SVG 测试占位页。你可以在 `src/data/menuItems.js` 中继续添加新的 Tile 配置。
 
 ### 4. 组件入口
 
