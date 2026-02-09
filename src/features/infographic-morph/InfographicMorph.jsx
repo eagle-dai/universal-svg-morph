@@ -21,9 +21,8 @@ import {
   createMorphInterpolator
 } from '../../lib/svgMorphEngine.js';
 import {
-  INFOGRAPHIC_LIBRARY,
-  INFOGRAPHIC_MAP,
-  VIEWBOX_SIZE
+  DEFAULT_VIEWBOX,
+  getInfographicLibrary
 } from './infographicLibrary.js';
 
 const MorphingPath = memo(
@@ -88,12 +87,9 @@ const MorphingPath = memo(
   }
 );
 
-const MiniPreview = memo(({ paths, colors }) => {
+const MiniPreview = memo(({ paths, colors, viewBox }) => {
   return (
-    <svg
-      viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
-      className="h-full w-full"
-    >
+    <svg viewBox={viewBox} className="h-full w-full">
       {paths.map((path, index) => (
         <path
           key={`${path}-${index}`}
@@ -135,7 +131,11 @@ const InfographicCard = ({ data, active, onClick, activeClass }) => {
           </div>
         </div>
         <div className="h-14 w-14 rounded-xl border border-slate-800 bg-slate-950 p-2">
-          <MiniPreview paths={data.paths} colors={data.colors} />
+          <MiniPreview
+            paths={data.paths}
+            colors={data.colors}
+            viewBox={data.viewBox || DEFAULT_VIEWBOX}
+          />
         </div>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -157,9 +157,39 @@ const InfographicCard = ({ data, active, onClick, activeClass }) => {
   );
 };
 
+const parseViewBox = (value) => {
+  if (!value) return null;
+  const parts = value
+    .trim()
+    .split(/[\s,]+/)
+    .map((entry) => Number.parseFloat(entry));
+  if (parts.length < 4 || parts.some((part) => Number.isNaN(part))) {
+    return null;
+  }
+  const [minX, minY, width, height] = parts;
+  return { minX, minY, width, height };
+};
+
+const mergeViewBox = (a, b) => {
+  const first = parseViewBox(a);
+  const second = parseViewBox(b);
+  if (!first && !second) return DEFAULT_VIEWBOX;
+  if (!first) return b;
+  if (!second) return a;
+  const minX = Math.min(first.minX, second.minX);
+  const minY = Math.min(first.minY, second.minY);
+  const maxX = Math.max(first.minX + first.width, second.minX + second.width);
+  const maxY = Math.max(first.minY + first.height, second.minY + second.height);
+  return `${minX} ${minY} ${maxX - minX} ${maxY - minY}`;
+};
+
 export default function InfographicMorph({ onBack }) {
-  const [startId, setStartId] = useState(INFOGRAPHIC_LIBRARY[0].id);
-  const [endId, setEndId] = useState(INFOGRAPHIC_LIBRARY[1].id);
+  const { library: infographicLibrary, map: infographicMap } = useMemo(
+    () => getInfographicLibrary(),
+    []
+  );
+  const [startId, setStartId] = useState(() => infographicLibrary[0]?.id);
+  const [endId, setEndId] = useState(() => infographicLibrary[1]?.id);
   const [optimize, setOptimize] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const containerRef = useRef(null);
@@ -175,13 +205,29 @@ export default function InfographicMorph({ onBack }) {
     []
   );
 
-  const startData = INFOGRAPHIC_MAP[startId];
-  const endData = INFOGRAPHIC_MAP[endId];
+  const startData = infographicMap[startId];
+  const endData = infographicMap[endId];
 
-  const maxPaths = Math.max(startData.paths.length, endData.paths.length);
+  useEffect(() => {
+    if (!startData && infographicLibrary.length) {
+      setStartId(infographicLibrary[0].id);
+    }
+    if (!endData && infographicLibrary.length > 1) {
+      setEndId(infographicLibrary[1].id);
+    }
+  }, [endData, infographicLibrary, startData]);
+
+  const maxPaths = Math.max(
+    startData?.paths.length || 0,
+    endData?.paths.length || 0
+  );
   const isMassive = maxPaths > 80;
   const staticSamples = isMassive ? 40 : maxPaths > 40 ? 80 : 120;
   const motionSampleStep = isMassive ? 2 : 1;
+  const mergedViewBox = mergeViewBox(
+    startData?.viewBox || DEFAULT_VIEWBOX,
+    endData?.viewBox || DEFAULT_VIEWBOX
+  );
 
   useEffect(() => {
     return () => {
@@ -249,6 +295,7 @@ export default function InfographicMorph({ onBack }) {
   };
 
   const renderItems = Array.from({ length: maxPaths }).map((_, index) => {
+    if (!startData || !endData) return null;
     const sIndex = index % startData.paths.length;
     const eIndex = index % endData.paths.length;
     const sColorIndex = sIndex % startData.colors.length;
@@ -261,6 +308,14 @@ export default function InfographicMorph({ onBack }) {
       endColor: endData.colors[eColorIndex]
     };
   });
+
+  if (!startData || !endData) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-slate-200">
+        正在加载图示库...
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100">
@@ -342,7 +397,7 @@ export default function InfographicMorph({ onBack }) {
                 </div>
               </div>
               <div className="space-y-4">
-                {INFOGRAPHIC_LIBRARY.map((item) => (
+                {infographicLibrary.map((item) => (
                   <InfographicCard
                     key={`start-${item.id}`}
                     data={item}
@@ -363,7 +418,7 @@ export default function InfographicMorph({ onBack }) {
                 </div>
               </div>
               <div className="space-y-4">
-                {INFOGRAPHIC_LIBRARY.map((item) => (
+                {infographicLibrary.map((item) => (
                   <InfographicCard
                     key={`end-${item.id}`}
                     data={item}
@@ -395,23 +450,25 @@ export default function InfographicMorph({ onBack }) {
               }}
             />
             <svg
-              viewBox={`0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
+              viewBox={mergedViewBox}
               className="relative z-10 h-full w-full p-10"
               style={{ filter: 'drop-shadow(0 0 18px rgba(0,0,0,0.5))' }}
             >
-              {renderItems.map((item) => (
-                <MorphingPath
-                  key={item.key}
-                  startD={item.startD}
-                  endD={item.endD}
-                  startColor={item.startColor}
-                  endColor={item.endColor}
-                  optimize={optimize}
-                  samples={staticSamples}
-                  isMassive={isMassive}
-                  onRegister={handleRegister}
-                />
-              ))}
+              {renderItems.map((item) =>
+                item ? (
+                  <MorphingPath
+                    key={item.key}
+                    startD={item.startD}
+                    endD={item.endD}
+                    startColor={item.startColor}
+                    endColor={item.endColor}
+                    optimize={optimize}
+                    samples={staticSamples}
+                    isMassive={isMassive}
+                    onRegister={handleRegister}
+                  />
+                ) : null
+              )}
             </svg>
           </div>
 
@@ -443,8 +500,8 @@ export default function InfographicMorph({ onBack }) {
               <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 text-xs text-slate-400">
                 <p className="leading-relaxed">
                   当前 Morph 以 <span className="text-amber-200">SVG Path</span>{' '}
-                  为基底，模拟 @antv/infographic 生成的矢量结构。选取图示库中最典型的
-                  10 个模板，在视觉上统一为 200x200 的可 Morph 网格。
+                  为基底，直接来自 @antv/infographic 的模板渲染结果。选取图示库中最典型的
+                  10 个模板，在视觉上统一为可 Morph 网格。
                 </p>
               </div>
             </div>
