@@ -122,6 +122,23 @@ const MiniPreview = memo(({ paths, colors, viewBox }) => {
   );
 });
 
+const StaticPreview = memo(({ paths, colors, viewBox }) => {
+  return (
+    <svg viewBox={viewBox} className="h-full w-full">
+      {paths.map((path, index) => (
+        <path
+          key={`${path}-${index}`}
+          d={path}
+          fill={colors[index % colors.length]}
+          stroke={colors[index % colors.length]}
+          strokeWidth={1}
+          fillOpacity={0.9}
+        />
+      ))}
+    </svg>
+  );
+});
+
 const StatPill = ({ label, value }) => (
   <div className="rounded-full border border-slate-800 bg-slate-950 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
     {label} <span className="text-slate-200">{value}</span>
@@ -488,7 +505,7 @@ export default function InfographicMorph({ onBack }) {
         >
           <div
             ref={containerRef}
-            className="relative aspect-square w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 shadow-2xl"
+            className="relative aspect-[3/2] w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 shadow-2xl"
           >
             <div
               className="absolute inset-0 opacity-20"
@@ -499,29 +516,61 @@ export default function InfographicMorph({ onBack }) {
                 backgroundPosition: 'center'
               }}
             />
-            <svg
-              viewBox={expandedViewBox}
-              className="relative z-10 h-full w-full p-10"
-              style={{ filter: 'drop-shadow(0 0 18px rgba(0,0,0,0.5))' }}
-            >
-              {renderItems.map((item) =>
-                item ? (
-                  <MorphingPath
-                    key={item.key}
-                    startD={item.startD}
-                    endD={item.endD}
-                    startColor={item.startColor}
-                    endColor={item.endColor}
-                    optimize={optimize}
-                    samples={staticSamples}
-                    isMassive={isMassive}
-                    onRegister={handleRegister}
-                    separate={separate}
-                    separationOffset={MORPH_DEFAULTS.separationOffset}
+            <div className="relative z-10 flex h-full w-full items-center gap-12 p-8">
+              <div className="flex min-h-0 flex-1 flex-col gap-3 rounded-2xl border border-amber-400/20 bg-slate-950/40 p-4">
+                <div className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-300">
+                  源 SVG
+                </div>
+                <div className="flex-1">
+                  <StaticPreview
+                    paths={startData.paths}
+                    colors={startData.colors}
+                    viewBox={startData.viewBox || DEFAULT_VIEWBOX}
                   />
-                ) : null
-              )}
-            </svg>
+                </div>
+              </div>
+              <div className="flex min-h-0 flex-1 flex-col gap-3 rounded-2xl border border-blue-400/20 bg-slate-950/40 p-4">
+                <div className="text-xs font-semibold uppercase tracking-[0.3em] text-blue-300">
+                  目标 SVG
+                </div>
+                <div className="flex-1">
+                  <StaticPreview
+                    paths={endData.paths}
+                    colors={endData.colors}
+                    viewBox={endData.viewBox || DEFAULT_VIEWBOX}
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-200 ${
+                isPlaying ? 'opacity-100' : 'opacity-0'
+              }`}
+            >
+              <svg
+                viewBox={expandedViewBox}
+                className="h-4/5 w-4/5"
+                style={{ filter: 'drop-shadow(0 0 18px rgba(0,0,0,0.5))' }}
+              >
+                {renderItems.map((item) =>
+                  item ? (
+                    <MorphingPath
+                      key={item.key}
+                      startD={item.startD}
+                      endD={item.endD}
+                      startColor={item.startColor}
+                      endColor={item.endColor}
+                      optimize={optimize}
+                      samples={staticSamples}
+                      isMassive={isMassive}
+                      onRegister={handleRegister}
+                      separate={separate}
+                      separationOffset={MORPH_DEFAULTS.separationOffset}
+                    />
+                  ) : null
+                )}
+              </svg>
+            </div>
           </div>
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4">
