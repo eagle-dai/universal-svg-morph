@@ -17,11 +17,11 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 'infographic-test',
-    title: 'Infographic SVG 测试',
-    description: '预留用于接入 AntV Infographic 生成的 SVG 样式。',
-    badge: '测试页面',
-    cta: '进入占位页',
+    id: 'infographic-morph',
+    title: 'Infographic SVG 形态',
+    description: '预留用于接入 AntV Infographic 生成的 SVG 形态样式。',
+    badge: '形态页面',
+    cta: '进入形态页',
     icon: Image,
     theme: {
       accent: 'amber',

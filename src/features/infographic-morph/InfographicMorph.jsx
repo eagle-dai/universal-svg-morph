@@ -1,6 +1,6 @@
 import { ArrowLeft, Image } from 'lucide-react';
 
-export default function InfographicTest({ onBack }) {
+export default function InfographicMorph({ onBack }) {
   return (
     <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100">
       <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-900/80 px-6 py-5 backdrop-blur">
@@ -18,11 +18,11 @@ export default function InfographicTest({ onBack }) {
             ) : null}
             <h1 className="flex items-center gap-2 text-2xl font-semibold text-white">
               <Image className="text-amber-300" size={20} />
-              Infographic SVG 测试页
+              Infographic SVG 形态页
             </h1>
           </div>
           <p className="text-xs text-slate-400">
-            预留用于接入 Infographic 生成的 SVG 结果。
+            预留用于接入 Infographic 生成的 SVG 形态结果。
           </p>
         </div>
       </header>
