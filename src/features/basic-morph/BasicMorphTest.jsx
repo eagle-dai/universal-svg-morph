@@ -14,8 +14,10 @@ const MORPH_CONFIG = {
 };
 
 const BASE_SHAPES = {
-  source: 'M 100, 100 m -80, 0 a 80,80 0 1,0 160,0 a 80,80 0 1,0 -160,0',
-  target: 'M 100,20 L 170,60 L 170,140 L 100,180 L 30,140 L 30,60 Z'
+  source:
+    'M 100 18 C 122 24 138 40 150 60 C 168 72 178 92 176 114 C 174 138 158 154 140 166 C 124 178 104 186 84 182 C 62 178 42 164 32 144 C 20 124 18 102 26 82 C 34 60 50 38 72 26 C 82 20 92 16 100 18 Z',
+  target:
+    'M 100 24 L 132 36 L 164 62 L 172 98 L 160 132 L 132 156 L 100 176 L 68 156 L 40 132 L 28 98 L 36 62 L 68 36 Z'
 };
 
 const BASE_COLORS = {
@@ -25,27 +27,26 @@ const BASE_COLORS = {
 
 const TRANSFORMED_META = {
   label: '带 Transform',
-  transform: 'translate(-22 12) rotate(-28 100 100) scale(0.82)'
+  sourceTransform: 'translate(-26 10) rotate(-18 100 100) scale(0.84)',
+  targetTransform: 'translate(18 -6) rotate(22 100 100) scale(0.88)',
+  stageTransform: 'translate(-6 6) rotate(4 100 100) scale(0.9)'
 };
 
 const buildMorphLoop = ({ pathRef, interpolator, colorData, duration }) => {
   if (!pathRef.current || !interpolator) return () => {};
   let animationFrame = 0;
-  let direction = 1;
   let startTime = performance.now();
 
   const renderFrame = (timestamp) => {
     const progress = Math.min((timestamp - startTime) / duration, 1);
-    const t = direction === 1 ? progress : 1 - progress;
-    const d = buildAnimatedPathD(interpolator.a, interpolator.b, t, 1);
-    const currentColor = lerpColor(colorData, t);
+    const d = buildAnimatedPathD(interpolator.a, interpolator.b, progress, 1);
+    const currentColor = lerpColor(colorData, progress);
     pathRef.current.setAttribute('d', d);
     pathRef.current.setAttribute('fill', currentColor);
     pathRef.current.setAttribute('stroke', currentColor);
 
     if (progress >= 1) {
-      direction *= -1;
-      startTime = timestamp;
+      return;
     }
 
     animationFrame = requestAnimationFrame(renderFrame);
@@ -155,17 +156,17 @@ const MorphRow = ({ title, transform }) => (
           label="源 SVG 示例"
           path={BASE_SHAPES.source}
           color={BASE_COLORS.source}
-          transform={transform}
+          transform={transform?.source ?? transform}
         />
         <SvgPreview
           label="目标 SVG 示例"
           path={BASE_SHAPES.target}
           color={BASE_COLORS.target}
-          transform={transform}
+          transform={transform?.target ?? transform}
         />
       </div>
     </div>
-    <MorphStage transform={transform} />
+    <MorphStage transform={transform?.stage ?? transform} />
   </div>
 );
 
@@ -197,7 +198,7 @@ export default function BasicMorphTest({ onBack }) {
 
       <main className="mx-auto w-full max-w-6xl space-y-10 px-6 py-10">
         <MorphRow title="基础形态对比" transform={null} />
-        <MorphRow title={TRANSFORMED_META.label} transform={TRANSFORMED_META.transform} />
+        <MorphRow title={TRANSFORMED_META.label} transform={TRANSFORMED_META} />
       </main>
     </div>
   );
