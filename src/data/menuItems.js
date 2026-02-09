@@ -1,4 +1,4 @@
-import { Image, Waves, ZapOff } from 'lucide-react';
+import { Grid2X2, Image, Waves, ZapOff } from 'lucide-react';
 
 export const MENU_ITEMS = [
   {
@@ -44,6 +44,21 @@ export const MENU_ITEMS = [
       border: 'border-amber-500/40',
       text: 'text-amber-200',
       glow: 'shadow-amber-500/30'
+    }
+  },
+  {
+    id: 'infographic-example',
+    title: 'AntV Infographic 示例',
+    description: '直接浏览 AntV Infographic 预设模板的渲染效果。',
+    badge: '示例库',
+    cta: '查看示例',
+    icon: Grid2X2,
+    theme: {
+      accent: 'emerald',
+      background: 'bg-emerald-500/10',
+      border: 'border-emerald-500/40',
+      text: 'text-emerald-200',
+      glow: 'shadow-emerald-500/30'
     }
   }
 ];
