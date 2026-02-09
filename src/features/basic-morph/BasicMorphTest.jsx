@@ -1,35 +1,35 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { ArrowLeft, Waves } from 'lucide-react';
+import { useEffect, useMemo, useRef } from "react";
+import { ArrowLeft, Waves } from "lucide-react";
 import {
   buildAnimatedPathD,
   buildStaticPathD,
   createColorLerp,
   createMorphInterpolator,
-  lerpColor
-} from '../../lib/svgMorphEngine.js';
+  lerpColor,
+} from "../../lib/svgMorphEngine.js";
 
 const MORPH_CONFIG = {
   samples: 160,
-  duration: 2200
+  duration: 2200,
 };
 
 const BASE_SHAPES = {
   source:
-    'M 100 18 C 122 24 138 40 150 60 C 168 72 178 92 176 114 C 174 138 158 154 140 166 C 124 178 104 186 84 182 C 62 178 42 164 32 144 C 20 124 18 102 26 82 C 34 60 50 38 72 26 C 82 20 92 16 100 18 Z',
+    "M 100 18 C 122 24 138 40 150 60 C 168 72 178 92 176 114 C 174 138 158 154 140 166 C 124 178 104 186 84 182 C 62 178 42 164 32 144 C 20 124 18 102 26 82 C 34 60 50 38 72 26 C 82 20 92 16 100 18 Z",
   target:
-    'M 100 24 L 132 36 L 164 62 L 172 98 L 160 132 L 132 156 L 100 176 L 68 156 L 40 132 L 28 98 L 36 62 L 68 36 Z'
+    "M 100 24 L 132 36 L 164 62 L 172 98 L 160 132 L 132 156 L 100 176 L 68 156 L 40 132 L 28 98 L 36 62 L 68 36 Z",
 };
 
 const BASE_COLORS = {
-  source: '#60A5FA',
-  target: '#F97316'
+  source: "#60A5FA",
+  target: "#F97316",
 };
 
 const TRANSFORMED_META = {
-  label: '带 Transform',
-  sourceTransform: 'translate(-32 6) rotate(-18 100 100)',
-  targetTransform: 'translate(28 -8) rotate(20 100 100) scale(0.8)',
-  stageTransform: 'translate(-6 6) rotate(4 100 100) scale(0.9)'
+  label: "带 Transform",
+  sourceTransform: "translate(-32 6) rotate(-18 100 100)",
+  targetTransform: "translate(28 -8) rotate(20 100 100) scale(0.8)",
+  stageTransform: "translate(-6 6) rotate(4 100 100) scale(0.9)",
 };
 
 const buildMorphLoop = ({ pathRef, interpolator, colorData, duration }) => {
@@ -41,9 +41,9 @@ const buildMorphLoop = ({ pathRef, interpolator, colorData, duration }) => {
     const progress = Math.min((timestamp - startTime) / duration, 1);
     const d = buildAnimatedPathD(interpolator.a, interpolator.b, progress, 1);
     const currentColor = lerpColor(colorData, progress);
-    pathRef.current.setAttribute('d', d);
-    pathRef.current.setAttribute('fill', currentColor);
-    pathRef.current.setAttribute('stroke', currentColor);
+    pathRef.current.setAttribute("d", d);
+    pathRef.current.setAttribute("fill", currentColor);
+    pathRef.current.setAttribute("stroke", currentColor);
 
     if (progress >= 1) {
       return;
@@ -80,23 +80,20 @@ const MorphStage = ({ transform }) => {
     () =>
       createMorphInterpolator(BASE_SHAPES.source, BASE_SHAPES.target, {
         samples: MORPH_CONFIG.samples,
-        optimize: true
+        optimize: true,
       }),
-    []
+    [],
   );
   const colorData = useMemo(
     () => createColorLerp(BASE_COLORS.source, BASE_COLORS.target),
-    []
+    [],
   );
 
   useEffect(() => {
     if (!pathRef.current || !interpolator) return;
-    pathRef.current.setAttribute(
-      'd',
-      buildStaticPathD(interpolator.a, 1)
-    );
-    pathRef.current.setAttribute('fill', BASE_COLORS.source);
-    pathRef.current.setAttribute('stroke', BASE_COLORS.source);
+    pathRef.current.setAttribute("d", buildStaticPathD(interpolator.a, 1));
+    pathRef.current.setAttribute("fill", BASE_COLORS.source);
+    pathRef.current.setAttribute("stroke", BASE_COLORS.source);
     return () => {
       if (loopCleanupRef.current) {
         loopCleanupRef.current();
@@ -122,7 +119,7 @@ const MorphStage = ({ transform }) => {
               pathRef,
               interpolator,
               colorData,
-              duration: MORPH_CONFIG.duration
+              duration: MORPH_CONFIG.duration,
             });
           }}
           className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200 transition hover:border-emerald-400 hover:text-white"
@@ -187,7 +184,9 @@ export default function BasicMorphTest({ onBack }) {
                   返回菜单
                 </button>
               ) : null}
-              <h1 className="text-2xl font-semibold text-white">基础 Morph 测试页</h1>
+              <h1 className="text-2xl font-semibold text-white">
+                基础 Morph 测试页
+              </h1>
             </div>
             <p className="text-sm text-slate-400">
               用最小示例验证 SVG 路径在不同条件下的 Morph 动画效果。
