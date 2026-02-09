@@ -23,12 +23,9 @@ import {
 } from '../../lib/svgMorphEngine.js';
 import {
   DEFAULT_VIEWBOX,
-  getInfographicLibrary
+  getInfographicLibrary,
+  MORPH_DEFAULTS
 } from './infographicLibrary.js';
-
-const DEMO_LAYOUT = {
-  separationOffset: 36
-};
 
 const offsetPoints = (points, dx = 0, dy = 0) =>
   points.map((point) => ({
@@ -220,7 +217,9 @@ export default function InfographicMorph({ onBack }) {
   const [startId, setStartId] = useState(() => infographicLibrary[0]?.id);
   const [endId, setEndId] = useState(() => infographicLibrary[1]?.id);
   const [optimize, setOptimize] = useState(true);
-  const [separate, setSeparate] = useState(true);
+  const [separate, setSeparate] = useState(
+    MORPH_DEFAULTS.separateByDefault
+  );
   const [isPlaying, setIsPlaying] = useState(false);
   const containerRef = useRef(null);
   const engineRef = useRef(null);
@@ -259,7 +258,7 @@ export default function InfographicMorph({ onBack }) {
     endData?.viewBox || DEFAULT_VIEWBOX
   );
   const expandedViewBox = separate
-    ? expandViewBox(mergedViewBox, DEMO_LAYOUT.separationOffset)
+    ? expandViewBox(mergedViewBox, MORPH_DEFAULTS.separationOffset)
     : mergedViewBox;
 
   useEffect(() => {
@@ -483,7 +482,10 @@ export default function InfographicMorph({ onBack }) {
           </div>
         </section>
 
-        <aside className="flex w-full flex-col gap-6 lg:w-[460px]">
+        <aside
+          className="flex w-full flex-col gap-6"
+          style={{ width: `min(100%, ${MORPH_DEFAULTS.previewWidth}px)` }}
+        >
           <div
             ref={containerRef}
             className="relative aspect-square w-full overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/60 shadow-2xl"
@@ -515,7 +517,7 @@ export default function InfographicMorph({ onBack }) {
                     isMassive={isMassive}
                     onRegister={handleRegister}
                     separate={separate}
-                    separationOffset={DEMO_LAYOUT.separationOffset}
+                    separationOffset={MORPH_DEFAULTS.separationOffset}
                   />
                 ) : null
               )}
