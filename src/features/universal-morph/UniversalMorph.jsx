@@ -236,31 +236,31 @@ export default function UniversalMorph({ onBack }) {
   });
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100 font-sans">
+    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans">
       {/* Header */}
-      <div className="bg-slate-900 border-b border-slate-800 p-6 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-xl">
+      <div className="bg-white/90 border-b border-slate-200 p-6 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-sm backdrop-blur">
         <div>
           <div className="flex flex-wrap items-center gap-3">
             {onBack ? (
               <button
                 type="button"
                 onClick={onBack}
-                className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-200 transition hover:border-emerald-500/60 hover:text-emerald-300"
+                className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-emerald-300 hover:text-emerald-600"
               >
                 <ArrowLeft size={14} />
                 返回菜单
               </button>
             ) : null}
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <ZapOff className="text-emerald-400" />
+            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <ZapOff className="text-emerald-600" />
               通用 SVG 变形引擎 V6 (Anime.js 4 Timeline)
             </h1>
           </div>
-          <p className="text-slate-400 text-xs mt-2 flex items-center gap-2">
-            <span className="text-emerald-400">Timeline Orchestration</span>
-            <span className="w-1 h-1 bg-slate-600 rounded-full"></span>
+          <p className="text-slate-500 text-xs mt-2 flex items-center gap-2">
+            <span className="text-emerald-600">Timeline Orchestration</span>
+            <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
             <span>JSX 控制偏移</span>
-            <span className="w-1 h-1 bg-slate-600 rounded-full"></span>
+            <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
             <span>背景缩放联动</span>
           </p>
         </div>
@@ -273,8 +273,8 @@ export default function UniversalMorph({ onBack }) {
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border ${
               optimize
-                ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-400"
-                : "bg-slate-800 border-slate-700 text-slate-500"
+                ? "bg-emerald-50 border-emerald-500/40 text-emerald-700"
+                : "bg-white border-slate-200 text-slate-500"
             }`}
           >
             <Settings2 size={14} />
@@ -288,8 +288,8 @@ export default function UniversalMorph({ onBack }) {
             }}
             className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border ${
               separate
-                ? "bg-blue-500/10 border-blue-500/50 text-blue-300"
-                : "bg-slate-800 border-slate-700 text-slate-500"
+                ? "bg-blue-50 border-blue-500/40 text-blue-600"
+                : "bg-white border-slate-200 text-slate-500"
             }`}
           >
             <Layers size={14} />
@@ -298,7 +298,7 @@ export default function UniversalMorph({ onBack }) {
 
           <button
             onClick={handleSwap}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border bg-slate-800 border-slate-700 text-slate-200 hover:border-blue-400/70 hover:text-blue-300"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all border bg-white border-slate-200 text-slate-600 hover:border-blue-300 hover:text-blue-600"
           >
             <ArrowLeftRight size={14} />
             切换 Src / Dest
@@ -309,8 +309,8 @@ export default function UniversalMorph({ onBack }) {
             disabled={isPlaying}
             className={`px-8 py-2 rounded-full font-bold text-sm flex items-center gap-2 transition-all ${
               isPlaying
-                ? "bg-slate-800 text-slate-500 cursor-not-allowed"
-                : "bg-emerald-500 text-slate-900 hover:bg-emerald-400 hover:scale-105 shadow-lg shadow-emerald-500/20"
+                ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                : "bg-emerald-500 text-white hover:bg-emerald-400 hover:scale-105 shadow-lg shadow-emerald-200/60"
             }`}
           >
             {isPlaying ? (
@@ -328,8 +328,8 @@ export default function UniversalMorph({ onBack }) {
         {/* 左侧：选择器面板 */}
         <div className="flex-1 grid grid-cols-2 gap-6 overflow-y-auto max-h-[calc(100vh-140px)] pr-2 custom-scrollbar">
           <div className="space-y-6">
-            <div className="sticky top-0 bg-slate-950 pb-2 z-10 border-b border-slate-800 mb-4">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block text-center">
+            <div className="sticky top-0 bg-slate-50 pb-2 z-10 border-b border-slate-200 mb-4">
+              <span className="text-xs font-bold text-emerald-600 uppercase tracking-widest block text-center">
                 起始形状 (Start)
               </span>
             </div>
@@ -348,8 +348,8 @@ export default function UniversalMorph({ onBack }) {
                       }}
                       className={`p-3 rounded-lg flex flex-col items-center gap-2 transition-all border relative overflow-hidden ${
                         startKey === key
-                          ? "bg-slate-800 border-emerald-500 text-emerald-400 ring-1 ring-emerald-500/50"
-                          : "bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800"
+                          ? "bg-emerald-50 border-emerald-400 text-emerald-700 ring-1 ring-emerald-200"
+                          : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                       }`}
                     >
                       <item.icon size={20} />
@@ -367,8 +367,8 @@ export default function UniversalMorph({ onBack }) {
           </div>
 
           <div className="space-y-6">
-            <div className="sticky top-0 bg-slate-950 pb-2 z-10 border-b border-slate-800 mb-4">
-              <span className="text-xs font-bold text-blue-400 uppercase tracking-widest block text-center">
+            <div className="sticky top-0 bg-slate-50 pb-2 z-10 border-b border-slate-200 mb-4">
+              <span className="text-xs font-bold text-blue-600 uppercase tracking-widest block text-center">
                 目标形状 (End)
               </span>
             </div>
@@ -387,8 +387,8 @@ export default function UniversalMorph({ onBack }) {
                       }}
                       className={`p-3 rounded-lg flex flex-col items-center gap-2 transition-all border relative overflow-hidden ${
                         endKey === key
-                          ? "bg-slate-800 border-blue-500 text-blue-400 ring-1 ring-blue-500/50"
-                          : "bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800"
+                          ? "bg-blue-50 border-blue-400 text-blue-700 ring-1 ring-blue-200"
+                          : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                       }`}
                     >
                       <item.icon size={20} />
@@ -411,13 +411,13 @@ export default function UniversalMorph({ onBack }) {
           {/* 添加 ref 到 container 以便 Timeline 控制 */}
           <div
             ref={containerRef}
-            className="relative w-full aspect-square bg-slate-900/50 rounded-2xl border border-slate-800 flex items-center justify-center shadow-2xl backdrop-blur-sm overflow-hidden"
+            className="relative w-full aspect-square bg-white/80 rounded-2xl border border-slate-200 flex items-center justify-center shadow-xl backdrop-blur-sm overflow-hidden"
           >
             <div
               className="absolute inset-0 opacity-20 pointer-events-none"
               style={{
                 backgroundImage:
-                  "linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px)",
+                  "linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px)",
                 backgroundSize: "40px 40px",
                 backgroundPosition: "center",
               }}
@@ -446,28 +446,28 @@ export default function UniversalMorph({ onBack }) {
             </svg>
           </div>
 
-          <div className="w-full mt-6 bg-slate-900 rounded-xl p-4 border border-slate-800">
-            <h4 className="text-xs font-bold text-slate-400 mb-3 flex items-center gap-2">
+          <div className="w-full mt-6 bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+            <h4 className="text-xs font-bold text-slate-500 mb-3 flex items-center gap-2">
               <Cpu size={12} /> V6 Anime.js Timeline 统计
             </h4>
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="bg-slate-950 rounded p-2">
+              <div className="bg-slate-50 rounded p-2">
                 <div className="text-[10px] text-slate-500">活跃元素</div>
-                <div className="text-sm font-mono text-emerald-400">
+                <div className="text-sm font-mono text-emerald-600">
                   {maxPaths}
                 </div>
               </div>
-              <div className="bg-slate-950 rounded p-2">
+              <div className="bg-slate-50 rounded p-2">
                 <div className="text-[10px] text-slate-500">控制方式</div>
-                <div className="text-sm font-mono text-blue-400">
+                <div className="text-sm font-mono text-blue-600">
                   External Timeline
                 </div>
               </div>
-              <div className="bg-slate-950 rounded p-2">
+              <div className="bg-slate-50 rounded p-2">
                 <div className="text-[10px] text-slate-500">
                   Timeline Offset
                 </div>
-                <div className="text-sm font-mono text-purple-400">200ms</div>
+                <div className="text-sm font-mono text-purple-600">200ms</div>
               </div>
             </div>
           </div>

@@ -43,11 +43,11 @@ const TRANSFORMED_META = {
 };
 
 const SvgPreview = ({ label, path, color, transform }) => (
-  <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-    <div className="mb-3 flex items-center justify-between text-xs text-slate-400">
+  <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="mb-3 flex items-center justify-between text-xs text-slate-500">
       <span>{label}</span>
       {transform ? (
-        <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-300">
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600">
           transform
         </span>
       ) : null}
@@ -129,20 +129,20 @@ const MorphStage = ({ transformConfig }) => {
   };
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-lg">
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">
           Morph 动画
         </div>
         <button
           type="button"
           onClick={handlePlay}
-          className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200 transition hover:border-emerald-400 hover:text-white"
+          className="rounded-full border border-emerald-500/40 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 transition hover:border-emerald-500 hover:text-emerald-800"
         >
           开始 Morph
         </button>
       </div>
-      <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
         <svg viewBox="0 0 200 200" className="h-48 w-full">
           <path
             ref={pathRef}
@@ -161,8 +161,8 @@ const MorphRow = ({ title, transformMeta }) => {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-4">
-        <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
-          <Waves size={16} className="text-emerald-400" />
+        <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          <Waves size={16} className="text-emerald-600" />
           {title}
         </div>
         <div className="grid gap-4 md:grid-cols-2">
@@ -188,8 +188,8 @@ const MorphRow = ({ title, transformMeta }) => {
 
 export default function BasicMorphTest({ onBack }) {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <header className="border-b border-slate-800 bg-slate-900/80 px-6 py-5">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="border-b border-slate-200 bg-white/90 px-6 py-5">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-3">
@@ -197,17 +197,17 @@ export default function BasicMorphTest({ onBack }) {
                 <button
                   type="button"
                   onClick={onBack}
-                  className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-200 transition hover:border-emerald-500/60 hover:text-emerald-300"
+                  className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-emerald-300 hover:text-emerald-600"
                 >
                   <ArrowLeft size={14} />
                   返回菜单
                 </button>
               ) : null}
-              <h1 className="text-2xl font-semibold text-white">
+              <h1 className="text-2xl font-semibold text-slate-900">
                 基础 Morph 测试页
               </h1>
             </div>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-slate-600">
               用最小示例验证 SVG 路径在不同条件下的 Morph 动画效果 (Unified
               Engine)。
             </p>
