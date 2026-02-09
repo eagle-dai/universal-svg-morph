@@ -1,16 +1,95 @@
-const VIEWBOX_SIZE = 200;
+import { Infographic, getPalette, getTemplate } from '@antv/infographic';
 
-const PALETTE = {
-  amber: ['#fbbf24', '#f59e0b', '#fcd34d', '#fef3c7'],
-  cyan: ['#22d3ee', '#38bdf8', '#0ea5e9', '#cffafe'],
-  violet: ['#a78bfa', '#8b5cf6', '#c4b5fd', '#ede9fe'],
-  emerald: ['#34d399', '#10b981', '#6ee7b7', '#d1fae5'],
-  rose: ['#fb7185', '#f43f5e', '#fda4af', '#ffe4e6'],
-  sky: ['#38bdf8', '#0ea5e9', '#7dd3fc', '#e0f2fe'],
-  lime: ['#a3e635', '#84cc16', '#bef264', '#f7fee7'],
-  orange: ['#fb923c', '#f97316', '#fdba74', '#ffedd5'],
-  indigo: ['#818cf8', '#6366f1', '#a5b4fc', '#e0e7ff'],
-  teal: ['#2dd4bf', '#14b8a6', '#5eead4', '#ccfbf1']
+const VIEWBOX_SIZE = 200;
+const DEFAULT_VIEWBOX = `0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`;
+const FALLBACK_PALETTE = ['#1783FF', '#00C9C9', '#F0884D', '#D580FF'];
+
+const TEMPLATE_SPECS = [
+  {
+    id: 'sequence',
+    templateId: 'sequence-timeline-simple',
+    title: '顺序型节点',
+    description: '顺序型时间线模板，强调阶段与节点叙事。',
+    tags: ['顺序型', '时间线', '节点'],
+    itemCount: 4
+  },
+  {
+    id: 'step',
+    templateId: 'sequence-steps-simple',
+    title: '阶梯流程',
+    description: '阶梯式上升布局，适合展示成长路径。',
+    tags: ['顺序型', '阶梯', '流程'],
+    itemCount: 4
+  },
+  {
+    id: 'cycle',
+    templateId: 'chart-pie-donut-plain-text',
+    title: '环形循环',
+    description: '环形闭环结构，突出循环与迭代。',
+    tags: ['顺序型', '循环', '环形'],
+    itemCount: 5
+  },
+  {
+    id: 'matrix',
+    templateId: 'list-grid-badge-card',
+    title: '栅格矩阵',
+    description: '矩阵卡片布局，适合分类与对照信息。',
+    tags: ['顺序型', '矩阵', '卡片'],
+    itemCount: 4
+  },
+  {
+    id: 'mountain',
+    templateId: 'list-pyramid-rounded-rect-node',
+    title: '山峰趋势',
+    description: '金字塔层级布局，突出阶段起伏与对比。',
+    tags: ['顺序型', '趋势', '山峰'],
+    itemCount: 4
+  },
+  {
+    id: 'bar',
+    templateId: 'chart-column-simple',
+    title: '柱状对比',
+    description: '纵向柱状布局，用于强调强弱与排名。',
+    tags: ['对比型', '柱状', '排名'],
+    itemCount: 5
+  },
+  {
+    id: 'pros-cons',
+    templateId: 'compare-hierarchy-left-right-circle-node-pill-badge',
+    title: '优劣对比',
+    description: '左右对比动线，适合呈现观点差异。',
+    tags: ['对比型', '优劣', '观点'],
+    itemCount: 2
+  },
+  {
+    id: 'venn',
+    templateId: 'relation-circle-icon-badge',
+    title: '维恩关系',
+    description: '交集关系展示，体现共同与差异部分。',
+    tags: ['对比型', '关系', '交集'],
+    itemCount: 3
+  },
+  {
+    id: 'quadrant',
+    templateId: 'compare-quadrant-quarter-simple-card',
+    title: '四象限',
+    description: '四象限分布，用于定位优先级与策略。',
+    tags: ['四象限', '分布', '策略'],
+    itemCount: 4
+  },
+  {
+    id: 'swot',
+    templateId: 'list-grid-compact-card',
+    title: 'SWOT 分析',
+    description: '紧凑卡片矩阵，适合战略拆解与归类。',
+    tags: ['对比型', 'SWOT', '战略'],
+    itemCount: 4
+  }
+];
+
+const clampNumber = (value, fallback = 0) => {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
 };
 
 const rectPath = (x, y, w, h) => `M ${x} ${y} h ${w} v ${h} h ${-w} Z`;
@@ -39,261 +118,300 @@ const circlePath = (cx, cy, r) =>
     -r * 2
   } 0`;
 
-const trianglePath = (points) =>
-  `M ${points[0][0]} ${points[0][1]} L ${points
+const ellipsePath = (cx, cy, rx, ry) =>
+  `M ${cx - rx} ${cy} a ${rx} ${ry} 0 1 0 ${rx * 2} 0 a ${rx} ${ry} 0 1 0 ${
+    -rx * 2
+  } 0`;
+
+const polygonPath = (points) => {
+  if (!points.length) return null;
+  return `M ${points[0][0]} ${points[0][1]} L ${points
     .slice(1)
     .map(([x, y]) => `${x} ${y}`)
     .join(' L ')} Z`;
-
-const pieSlicePath = (cx, cy, r, startAngle, endAngle) => {
-  const toPoint = (angle) => {
-    const rad = ((angle - 90) * Math.PI) / 180;
-    return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
-  };
-  const [startX, startY] = toPoint(endAngle);
-  const [endX, endY] = toPoint(startAngle);
-  const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
-  return [
-    `M ${cx} ${cy}`,
-    `L ${startX} ${startY}`,
-    `A ${r} ${r} 0 ${largeArcFlag} 0 ${endX} ${endY}`,
-    'Z'
-  ].join(' ');
 };
 
-const makeSequenceCards = () => {
-  const line = roundedRectPath(96, 24, 8, 152, 4);
-  const nodes = [40, 80, 120, 160].flatMap((y) => [
-    circlePath(100, y, 10),
-    roundedRectPath(118, y - 10, 60, 20, 8)
-  ]);
-  return [line, ...nodes];
+const polylinePath = (points) => {
+  if (!points.length) return null;
+  return `M ${points[0][0]} ${points[0][1]} L ${points
+    .slice(1)
+    .map(([x, y]) => `${x} ${y}`)
+    .join(' L ')}`;
 };
 
-const makeStepCurve = () => {
-  const steps = [
-    roundedRectPath(24, 120, 40, 26, 10),
-    roundedRectPath(68, 95, 40, 26, 10),
-    roundedRectPath(112, 70, 40, 26, 10),
-    roundedRectPath(156, 45, 20, 26, 10)
-  ];
-  const rails = [
-    roundedRectPath(44, 108, 24, 6, 3),
-    roundedRectPath(88, 83, 24, 6, 3),
-    roundedRectPath(132, 58, 24, 6, 3)
-  ];
-  return [...steps, ...rails];
+const parsePoints = (value) => {
+  if (!value) return [];
+  return value
+    .trim()
+    .split(/[\s,]+/)
+    .map((entry) => Number.parseFloat(entry))
+    .reduce((acc, num, index) => {
+      if (index % 2 === 0) {
+        acc.push([num, 0]);
+      } else {
+        acc[acc.length - 1][1] = num;
+      }
+      return acc;
+    }, [])
+    .filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y));
 };
 
-const makeRingCycle = () => {
-  const slices = [
-    pieSlicePath(100, 90, 44, 0, 70),
-    pieSlicePath(100, 90, 44, 70, 140),
-    pieSlicePath(100, 90, 44, 140, 210),
-    pieSlicePath(100, 90, 44, 210, 280),
-    pieSlicePath(100, 90, 44, 280, 360)
-  ];
-  const inner = circlePath(100, 90, 24);
-  const label = roundedRectPath(60, 150, 80, 18, 9);
-  return [...slices, inner, label];
+const normalizeColor = (value) => {
+  if (!value) return null;
+  const normalized = value.trim();
+  if (!normalized || normalized === 'none') return null;
+  if (normalized.startsWith('url(')) return null;
+  return normalized;
 };
 
-const makeMatrix = () => {
-  const cards = [
-    roundedRectPath(28, 40, 64, 36, 10),
-    roundedRectPath(108, 40, 64, 36, 10),
-    roundedRectPath(28, 88, 64, 36, 10),
-    roundedRectPath(108, 88, 64, 36, 10)
-  ];
-  const labels = [
-    roundedRectPath(36, 50, 48, 6, 3),
-    roundedRectPath(116, 50, 48, 6, 3),
-    roundedRectPath(36, 98, 48, 6, 3),
-    roundedRectPath(116, 98, 48, 6, 3)
-  ];
-  return [...cards, ...labels];
+const extractShapeColor = (element) => {
+  const fill = normalizeColor(element.getAttribute('fill'));
+  if (fill) return fill;
+  const stroke = normalizeColor(element.getAttribute('stroke'));
+  if (stroke) return stroke;
+  const computed = window.getComputedStyle(element);
+  return normalizeColor(computed.fill) || normalizeColor(computed.stroke);
 };
 
-const makeMountain = () => {
-  const mountain1 = trianglePath([
-    [24, 150],
-    [70, 70],
-    [116, 150]
-  ]);
-  const mountain2 = trianglePath([
-    [84, 150],
-    [130, 60],
-    [176, 150]
-  ]);
-  const base = roundedRectPath(24, 150, 152, 12, 6);
-  const sun = circlePath(150, 48, 10);
-  return [mountain1, mountain2, base, sun];
-};
-
-const makeBarChart = () => {
-  const bars = [
-    roundedRectPath(30, 110, 24, 50, 6),
-    roundedRectPath(64, 90, 24, 70, 6),
-    roundedRectPath(98, 70, 24, 90, 6),
-    roundedRectPath(132, 80, 24, 80, 6),
-    roundedRectPath(166, 100, 24, 60, 6)
-  ];
-  const base = roundedRectPath(24, 160, 168, 8, 4);
-  return [...bars, base];
-};
-
-const makeProsCons = () => {
-  const leftArrow = trianglePath([
-    [24, 90],
-    [76, 60],
-    [76, 120]
-  ]);
-  const rightArrow = trianglePath([
-    [176, 90],
-    [124, 60],
-    [124, 120]
-  ]);
-  const center = roundedRectPath(88, 70, 24, 40, 8);
-  const labels = [
-    roundedRectPath(24, 130, 72, 18, 9),
-    roundedRectPath(104, 130, 72, 18, 9)
-  ];
-  return [leftArrow, rightArrow, center, ...labels];
-};
-
-const makeVenn = () => {
-  const left = circlePath(80, 100, 32);
-  const right = circlePath(120, 100, 32);
-  const labels = [
-    roundedRectPath(40, 48, 60, 12, 6),
-    roundedRectPath(100, 48, 60, 12, 6),
-    roundedRectPath(70, 140, 60, 12, 6)
-  ];
-  return [left, right, ...labels];
-};
-
-const makeQuadrant = () => {
-  const blocks = [
-    roundedRectPath(28, 40, 68, 48, 12),
-    roundedRectPath(104, 40, 68, 48, 12),
-    roundedRectPath(28, 100, 68, 48, 12),
-    roundedRectPath(104, 100, 68, 48, 12)
-  ];
-  const axis = [
-    roundedRectPath(96, 32, 8, 136, 4),
-    roundedRectPath(20, 92, 160, 8, 4)
-  ];
-  return [...blocks, ...axis];
-};
-
-const makeSwot = () => {
-  const columns = [
-    roundedRectPath(22, 36, 40, 90, 10),
-    roundedRectPath(64, 36, 40, 90, 10),
-    roundedRectPath(106, 36, 40, 90, 10),
-    roundedRectPath(148, 36, 30, 90, 10)
-  ];
-  const header = roundedRectPath(22, 20, 156, 12, 6);
-  const footer = roundedRectPath(22, 132, 156, 18, 9);
-  return [...columns, header, footer];
-};
-
-export const INFOGRAPHIC_LIBRARY = [
-  {
-    id: 'sequence',
-    title: '顺序型节点',
-    description: '顺序型时间线模板，强调阶段与节点叙事。',
-    tags: ['顺序型', '时间线', '节点'],
-    stats: { layers: 9, nodes: 4, blocks: 4 },
-    colors: PALETTE.amber,
-    paths: makeSequenceCards()
-  },
-  {
-    id: 'step',
-    title: '阶梯流程',
-    description: '阶梯式上升布局，适合展示成长路径。',
-    tags: ['顺序型', '阶梯', '流程'],
-    stats: { layers: 7, nodes: 4, blocks: 3 },
-    colors: PALETTE.cyan,
-    paths: makeStepCurve()
-  },
-  {
-    id: 'cycle',
-    title: '环形循环',
-    description: '环形闭环结构，突出循环与迭代。',
-    tags: ['顺序型', '循环', '环形'],
-    stats: { layers: 7, nodes: 5, blocks: 1 },
-    colors: PALETTE.violet,
-    paths: makeRingCycle()
-  },
-  {
-    id: 'matrix',
-    title: '栅格矩阵',
-    description: '矩阵卡片布局，适合分类与对照信息。',
-    tags: ['顺序型', '矩阵', '卡片'],
-    stats: { layers: 8, nodes: 4, blocks: 4 },
-    colors: PALETTE.rose,
-    paths: makeMatrix()
-  },
-  {
-    id: 'mountain',
-    title: '山峰趋势',
-    description: '山峰式趋势图，强调阶段起伏与对比。',
-    tags: ['顺序型', '趋势', '山峰'],
-    stats: { layers: 4, nodes: 2, blocks: 1 },
-    colors: PALETTE.emerald,
-    paths: makeMountain()
-  },
-  {
-    id: 'bar',
-    title: '柱状对比',
-    description: '纵向柱状布局，用于强调强弱与排名。',
-    tags: ['对比型', '柱状', '排名'],
-    stats: { layers: 6, nodes: 5, blocks: 1 },
-    colors: PALETTE.orange,
-    paths: makeBarChart()
-  },
-  {
-    id: 'pros-cons',
-    title: '优劣对比',
-    description: '正反对比动线，适合呈现观点差异。',
-    tags: ['对比型', '优劣', '观点'],
-    stats: { layers: 5, nodes: 2, blocks: 2 },
-    colors: PALETTE.indigo,
-    paths: makeProsCons()
-  },
-  {
-    id: 'venn',
-    title: '维恩关系',
-    description: '交集关系展示，体现共同与差异部分。',
-    tags: ['对比型', '关系', '交集'],
-    stats: { layers: 5, nodes: 2, blocks: 3 },
-    colors: PALETTE.teal,
-    paths: makeVenn()
-  },
-  {
-    id: 'quadrant',
-    title: '四象限',
-    description: '四象限分布，用于定位优先级与策略。',
-    tags: ['四象限', '分布', '策略'],
-    stats: { layers: 6, nodes: 4, blocks: 2 },
-    colors: PALETTE.sky,
-    paths: makeQuadrant()
-  },
-  {
-    id: 'swot',
-    title: 'SWOT 分析',
-    description: 'SWOT 结构矩阵，适合战略拆解。',
-    tags: ['对比型', 'SWOT', '战略'],
-    stats: { layers: 6, nodes: 4, blocks: 2 },
-    colors: PALETTE.lime,
-    paths: makeSwot()
+const elementToPath = (element) => {
+  const tag = element.tagName.toLowerCase();
+  if (tag === 'path') {
+    return element.getAttribute('d');
   }
-];
+  if (tag === 'rect') {
+    const x = clampNumber(element.getAttribute('x'));
+    const y = clampNumber(element.getAttribute('y'));
+    const width = clampNumber(element.getAttribute('width'));
+    const height = clampNumber(element.getAttribute('height'));
+    const rx = clampNumber(element.getAttribute('rx'));
+    const ry = clampNumber(element.getAttribute('ry'));
+    const radius = rx || ry;
+    return roundedRectPath(x, y, width, height, radius);
+  }
+  if (tag === 'circle') {
+    const cx = clampNumber(element.getAttribute('cx'));
+    const cy = clampNumber(element.getAttribute('cy'));
+    const r = clampNumber(element.getAttribute('r'));
+    return circlePath(cx, cy, r);
+  }
+  if (tag === 'ellipse') {
+    const cx = clampNumber(element.getAttribute('cx'));
+    const cy = clampNumber(element.getAttribute('cy'));
+    const rx = clampNumber(element.getAttribute('rx'));
+    const ry = clampNumber(element.getAttribute('ry'));
+    return ellipsePath(cx, cy, rx, ry);
+  }
+  if (tag === 'polygon') {
+    return polygonPath(parsePoints(element.getAttribute('points')));
+  }
+  if (tag === 'polyline') {
+    return polylinePath(parsePoints(element.getAttribute('points')));
+  }
+  if (tag === 'line') {
+    const x1 = clampNumber(element.getAttribute('x1'));
+    const y1 = clampNumber(element.getAttribute('y1'));
+    const x2 = clampNumber(element.getAttribute('x2'));
+    const y2 = clampNumber(element.getAttribute('y2'));
+    return `M ${x1} ${y1} L ${x2} ${y2}`;
+  }
+  return null;
+};
 
-export const INFOGRAPHIC_MAP = INFOGRAPHIC_LIBRARY.reduce((acc, item) => {
-  acc[item.id] = item;
-  return acc;
-}, {});
+const buildDefaultItems = (count, labelPrefix = '节点') =>
+  Array.from({ length: count }, (_, index) => ({
+    label: `${labelPrefix} ${index + 1}`,
+    value: 20 + index * 8,
+    desc: `关键信息 ${index + 1}`
+  }));
 
-export { VIEWBOX_SIZE };
+const buildCompareItems = (count) => {
+  const childCount = Math.max(2, count);
+  return [
+    {
+      label: '优势',
+      desc: '左侧要点',
+      children: buildDefaultItems(childCount, '优势').map((item, index) => ({
+        ...item,
+        label: `优势 ${index + 1}`
+      }))
+    },
+    {
+      label: '劣势',
+      desc: '右侧要点',
+      children: buildDefaultItems(childCount, '劣势').map((item, index) => ({
+        ...item,
+        label: `劣势 ${index + 1}`
+      }))
+    }
+  ];
+};
+
+const buildHierarchyRoot = (count) => ({
+  label: '核心主题',
+  desc: '结构树根节点',
+  children: buildDefaultItems(Math.max(2, count), '子节点')
+});
+
+const buildData = (templateId, count) => {
+  const items = buildDefaultItems(count);
+  const prefix = templateId.split('-')[0];
+  const base = {
+    title: 'Infographic',
+    desc: 'Generated by @antv/infographic'
+  };
+
+  if (prefix === 'list') {
+    return { ...base, items, lists: items };
+  }
+  if (prefix === 'sequence') {
+    return { ...base, items, sequences: items };
+  }
+  if (prefix === 'compare') {
+    const compares = buildCompareItems(count);
+    return { ...base, items: compares, compares };
+  }
+  if (prefix === 'relation') {
+    return { ...base, items, nodes: items };
+  }
+  if (prefix === 'chart') {
+    return { ...base, items, values: items };
+  }
+  if (prefix === 'hierarchy') {
+    const root = buildHierarchyRoot(count);
+    return { ...base, items: [root], root };
+  }
+
+  return { ...base, items };
+};
+
+const buildStats = (pathsCount, itemCount) => ({
+  layers: pathsCount,
+  nodes: itemCount,
+  blocks: Math.max(1, Math.round(pathsCount / Math.max(itemCount, 1)))
+});
+
+const extractPathsFromSvg = (svg, palette) => {
+  if (!svg) {
+    return {
+      paths: [],
+      colors: palette,
+      viewBox: DEFAULT_VIEWBOX
+    };
+  }
+
+  const shapes = svg.querySelectorAll(
+    'path, rect, circle, ellipse, polygon, polyline, line'
+  );
+  const paths = [];
+  const colorSet = new Set();
+
+  shapes.forEach((element) => {
+    const path = elementToPath(element);
+    if (!path) return;
+    paths.push(path);
+    const color = extractShapeColor(element);
+    if (color) {
+      colorSet.add(color);
+    }
+  });
+
+  let viewBox = svg.getAttribute('viewBox');
+  if (!viewBox) {
+    const bbox = svg.getBBox();
+    viewBox = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+  }
+
+  const colors = colorSet.size ? Array.from(colorSet) : palette;
+
+  return {
+    paths,
+    colors: colors.length ? colors : FALLBACK_PALETTE,
+    viewBox
+  };
+};
+
+const renderTemplate = (templateId, data, palette) => {
+  const container = document.createElement('div');
+  container.style.cssText =
+    'position:absolute;left:-9999px;top:-9999px;width:0;height:0;overflow:hidden;pointer-events:none;';
+  const host = document.body ?? document.documentElement;
+  host.appendChild(container);
+
+  const infographic = new Infographic({
+    container,
+    template: templateId,
+    data,
+    width: VIEWBOX_SIZE,
+    height: VIEWBOX_SIZE,
+    padding: 0,
+    themeConfig: {
+      palette
+    }
+  });
+
+  let result = null;
+  try {
+    infographic.render();
+    const svg = container.querySelector('svg');
+    result = extractPathsFromSvg(svg, palette);
+  } catch (error) {
+    console.warn(`Template render failed: ${templateId}`, error);
+    result = {
+      paths: [],
+      colors: palette,
+      viewBox: DEFAULT_VIEWBOX
+    };
+  }
+  infographic.destroy();
+  container.remove();
+  return result;
+};
+
+let cachedLibrary = null;
+
+export const getInfographicLibrary = () => {
+  if (cachedLibrary) {
+    return cachedLibrary;
+  }
+
+  if (typeof document === 'undefined') {
+    cachedLibrary = { library: [], map: {} };
+    return cachedLibrary;
+  }
+
+  const palette = getPalette('antv') ?? FALLBACK_PALETTE;
+
+  const library = TEMPLATE_SPECS.map((spec) => {
+    if (!getTemplate(spec.templateId)) {
+      console.warn(`Template not found: ${spec.templateId}`);
+      return null;
+    }
+    const data = buildData(spec.templateId, spec.itemCount);
+    const { paths, colors, viewBox } = renderTemplate(
+      spec.templateId,
+      data,
+      palette
+    );
+    return {
+      id: spec.id,
+      templateId: spec.templateId,
+      title: spec.title,
+      description: spec.description,
+      tags: spec.tags,
+      stats: buildStats(paths.length, data.items.length),
+      colors,
+      paths,
+      viewBox
+    };
+  }).filter(Boolean);
+
+  const map = library.reduce((acc, item) => {
+    acc[item.id] = item;
+    return acc;
+  }, {});
+
+  cachedLibrary = { library, map };
+  return cachedLibrary;
+};
+
+export { DEFAULT_VIEWBOX, VIEWBOX_SIZE };
