@@ -69,7 +69,7 @@ SVG 的 d 属性指令各不相同（如 C 曲线对 L 直线）。为了实现�
   - createMorphInterpolator: 创建包含正反向自动纠正的插值器。
   - createColorLerp / lerpColor: 颜色插值。
   - buildStaticPathD / buildAnimatedPathD: 路径字符串构建。
-  - createMorphEngine: 动画驱动与注册管理，支持 Timeline 接入。
+  - createMorphEngine: 动画驱动与注册管理，支持 Timeline 接入与 Transform 插值。
 - src/features/universal-morph/UniversalMorph.jsx: 变形引擎主组件，负责 UI 交互与引擎接入。
   - generate\*: 各种复杂 SVG 路径生成器（城市、花朵、矩阵等）。
   - SHAPE_LIBRARY: 预设的图形数据仓库。
@@ -149,6 +149,11 @@ const unregister = engine.register({
   data: interpolator,
   color: color,
   samples: 120,
+  // [可选] 支持 Transform 属性插值
+  transform: {
+    start: { x: 0, y: 0, r: 0, cx: 100, cy: 100, s: 1 },
+    end: { x: 50, y: 20, r: 45, cx: 100, cy: 100, s: 0.8 },
+  },
 });
 
 // 4. 播放动画

@@ -2,11 +2,10 @@ import { useEffect, useMemo, useRef } from "react";
 import { ArrowLeft, Waves } from "lucide-react";
 import { Timeline } from "animejs";
 import {
-  buildAnimatedPathD,
-  buildStaticPathD,
   createColorLerp,
+  createMorphEngine,
   createMorphInterpolator,
-  lerpColor,
+  buildStaticPathD,
 } from "../../lib/svgMorphEngine.js";
 
 const MORPH_CONFIG = {
@@ -27,25 +26,19 @@ const BASE_COLORS = {
 };
 
 // --- 1. 定义结构化的 Transform 数据 ---
-// 显式定义所有参数，避免插值歧义
 const TRANSFORM_DATA = {
   source: { x: -45, y: 6, r: -28, cx: 100, cy: 100, s: 1 },
   target: { x: 38, y: -8, r: 30, cx: 100, cy: 100, s: 0.8 },
 };
 
-// 辅助：生成标准的 SVG transform 字符串
+// 辅助：仅用于预览组件生成静态 Transform 字符串 (Logic 复用)
 const getTransformString = ({ x, y, r, cx, cy, s }) =>
   `translate(${x} ${y}) rotate(${r} ${cx} ${cy}) scale(${s})`;
 
-// 辅助：简单的线性插值
-const lerp = (start, end, t) => start + (end - start) * t;
-
 const TRANSFORMED_META = {
   label: "带 Transform",
-  // 为预览图生成静态字符串
   sourceTransform: getTransformString(TRANSFORM_DATA.source),
   targetTransform: getTransformString(TRANSFORM_DATA.target),
-  // 将原始数值配置传给动画组件
   config: TRANSFORM_DATA,
 };
 
@@ -69,6 +62,13 @@ const MorphStage = ({ transformConfig }) => {
   const pathRef = useRef(null);
   const timelineRef = useRef(null);
 
+  // 实例化 Engine
+  const engineRef = useRef(
+    createMorphEngine({
+      duration: MORPH_CONFIG.duration,
+    }),
+  );
+
   const interpolator = useMemo(
     () =>
       createMorphInterpolator(BASE_SHAPES.source, BASE_SHAPES.target, {
@@ -83,26 +83,28 @@ const MorphStage = ({ transformConfig }) => {
     [],
   );
 
-  // 初始化：设置静态初始状态
+  // 注册逻辑：将 Transform 配置传给 Engine
   useEffect(() => {
     if (!pathRef.current || !interpolator) return;
 
-    // 1. 设置初始 Path 和 Color
-    pathRef.current.setAttribute("d", buildStaticPathD(interpolator.a, 1));
-    pathRef.current.setAttribute("fill", BASE_COLORS.source);
-    pathRef.current.setAttribute("stroke", BASE_COLORS.source);
+    // 构造 Engine 需要的 Transform 对象格式
+    const transformData = transformConfig
+      ? { start: transformConfig.source, end: transformConfig.target }
+      : null;
 
-    // 2. 设置初始 Transform
-    if (transformConfig) {
-      pathRef.current.setAttribute(
-        "transform",
-        getTransformString(transformConfig.source),
-      );
-    } else {
-      pathRef.current.removeAttribute("transform");
-    }
+    const unregister = engineRef.current.register({
+      dom: pathRef.current,
+      data: interpolator,
+      color: colorData,
+      samples: MORPH_CONFIG.samples,
+      transform: transformData, // <--- 关键修改：统一 API
+    });
+
+    // 初始渲染静态帧
+    engineRef.current.renderStatic(0);
 
     return () => {
+      unregister();
       if (timelineRef.current) timelineRef.current.pause();
     };
   }, [colorData, interpolator, transformConfig]);
@@ -113,55 +115,14 @@ const MorphStage = ({ transformConfig }) => {
 
     const tl = new Timeline({
       duration: MORPH_CONFIG.duration,
-      easing: "inOutQuad",
+      easing: "inOutQuad", // Engine 内部默认 linear，这里通过 Timeline 控制 easing
     });
 
-    // 使用代理对象 t (0 -> 1)，在 onUpdate 中手动计算所有属性
-    const proxy = { t: 0 };
-
-    tl.add(
-      proxy,
-      {
-        t: 1,
-        onUpdate: () => {
-          const progress = proxy.t;
-
-          // A. Path & Color 插值
-          const d = buildAnimatedPathD(
-            interpolator.a,
-            interpolator.b,
-            progress,
-            1,
-          );
-          const currentColor = lerpColor(colorData, progress);
-          pathRef.current.setAttribute("d", d);
-          pathRef.current.setAttribute("fill", currentColor);
-          pathRef.current.setAttribute("stroke", currentColor);
-
-          // B. Transform 手动数值插值 (仅当配置存在时)
-          if (transformConfig) {
-            const { source: s, target: e } = transformConfig;
-
-            // 计算当前帧的各项数值
-            const currentTransform = {
-              x: lerp(s.x, e.x, progress),
-              y: lerp(s.y, e.y, progress),
-              r: lerp(s.r, e.r, progress),
-              cx: s.cx, // 中心点通常保持不变，或者也可以 lerp
-              cy: s.cy,
-              s: lerp(s.s, e.s, progress),
-            };
-
-            // 拼装字符串并应用
-            pathRef.current.setAttribute(
-              "transform",
-              getTransformString(currentTransform),
-            );
-          }
-        },
-      },
-      0,
-    );
+    // 使用 Engine 统一驱动
+    engineRef.current.play({
+      timeline: tl,
+      offset: 0,
+    });
 
     tl.play();
     timelineRef.current = tl;
@@ -185,14 +146,10 @@ const MorphStage = ({ transformConfig }) => {
         <svg viewBox="0 0 200 200" className="h-48 w-full">
           <path
             ref={pathRef}
+            // 初始状态由 renderStatic 接管，这里仅设置静态 fallback
             fill={BASE_COLORS.source}
             stroke={BASE_COLORS.source}
-            // 初始静态渲染也使用同样的生成逻辑
-            transform={
-              transformConfig
-                ? getTransformString(transformConfig.source)
-                : undefined
-            }
+            d={buildStaticPathD(interpolator?.a || [], 1)}
           />
         </svg>
       </div>
@@ -251,7 +208,8 @@ export default function BasicMorphTest({ onBack }) {
               </h1>
             </div>
             <p className="text-sm text-slate-400">
-              用最小示例验证 SVG 路径在不同条件下的 Morph 动画效果。
+              用最小示例验证 SVG 路径在不同条件下的 Morph 动画效果 (Unified
+              Engine)。
             </p>
           </div>
         </div>

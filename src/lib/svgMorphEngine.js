@@ -129,6 +129,23 @@ export const lerpColor = (colorData, factor) => {
   return `rgb(${r},${g},${b})`;
 };
 
+// --- Transform Helpers ---
+const lerp = (start, end, t) => start + (end - start) * t;
+
+const buildTransformString = ({ x, y, r, cx, cy, s }) =>
+  `translate(${x} ${y}) rotate(${r} ${cx} ${cy}) scale(${s})`;
+
+const lerpTransform = (start, end, t) => ({
+  x: lerp(start.x, end.x, t),
+  y: lerp(start.y, end.y, t),
+  r: lerp(start.r, end.r, t),
+  cx: start.cx, // 通常中心点在 Morph 中保持一致，若需变动也可 lerp
+  cy: start.cy,
+  s: lerp(start.s, end.s, t),
+});
+
+// --- Path Helpers ---
+
 export const buildStaticPathD = (points, precision = 1) => {
   if (!points?.length) return "";
   let d = "M";
@@ -149,9 +166,12 @@ export const buildAnimatedPathD = (fromPoints, toPoints, t, step = 1) => {
   return `${d.slice(0, -1)}Z`;
 };
 
+// --- Engine Core ---
+
 export const createMorphEngine = ({ duration = 2000 } = {}) => {
   const registry = new Map();
 
+  // 注册接口新增 transform: { start, end } 可选参数
   const register = (item) => {
     const id = Symbol("morph-item");
     registry.set(id, item);
@@ -159,13 +179,22 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
   };
 
   const renderStatic = (t = 0, precision = 1) => {
-    registry.forEach(({ dom, data, color, samples }) => {
+    registry.forEach(({ dom, data, color, samples, transform }) => {
+      // 1. Path & Color
       const target = t >= 1 ? data.b : data.a;
       const d = buildStaticPathD(target.slice(0, samples), precision);
       const c = lerpColor(color, t);
       dom.setAttribute("d", d);
       dom.setAttribute("fill", c);
       dom.setAttribute("stroke", c);
+
+      // 2. Transform (如果有)
+      if (transform) {
+        const targetTransform = t >= 1 ? transform.end : transform.start;
+        dom.setAttribute("transform", buildTransformString(targetTransform));
+      } else {
+        dom.removeAttribute("transform");
+      }
     });
   };
 
@@ -183,12 +212,19 @@ export const createMorphEngine = ({ duration = 2000 } = {}) => {
 
     // 渲染帧逻辑
     const renderFrame = (t) => {
-      registry.forEach(({ dom, data, color }) => {
+      registry.forEach(({ dom, data, color, transform }) => {
+        // A. Path & Color
         const d = buildAnimatedPathD(data.a, data.b, t, motionSampleStep);
         const curColor = lerpColor(color, t);
         dom.setAttribute("d", d);
         dom.setAttribute("fill", curColor);
         dom.setAttribute("stroke", curColor);
+
+        // B. Transform (新增支持)
+        if (transform) {
+          const curTransform = lerpTransform(transform.start, transform.end, t);
+          dom.setAttribute("transform", buildTransformString(curTransform));
+        }
       });
     };
 
