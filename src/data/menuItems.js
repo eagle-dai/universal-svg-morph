@@ -10,10 +10,10 @@ export const MENU_ITEMS = [
     icon: Waves,
     theme: {
       accent: 'cyan',
-      background: 'bg-cyan-500/10',
-      border: 'border-cyan-500/40',
-      text: 'text-cyan-200',
-      glow: 'shadow-cyan-500/30'
+      background: 'bg-cyan-100/70',
+      border: 'border-cyan-200',
+      text: 'text-cyan-700',
+      glow: 'bg-cyan-200/70'
     }
   },
   {
@@ -25,10 +25,10 @@ export const MENU_ITEMS = [
     icon: ZapOff,
     theme: {
       accent: 'emerald',
-      background: 'bg-emerald-500/10',
-      border: 'border-emerald-500/40',
-      text: 'text-emerald-300',
-      glow: 'shadow-emerald-500/30'
+      background: 'bg-emerald-100/70',
+      border: 'border-emerald-200',
+      text: 'text-emerald-700',
+      glow: 'bg-emerald-200/70'
     }
   },
   {
@@ -40,10 +40,10 @@ export const MENU_ITEMS = [
     icon: Image,
     theme: {
       accent: 'amber',
-      background: 'bg-amber-500/10',
-      border: 'border-amber-500/40',
-      text: 'text-amber-200',
-      glow: 'shadow-amber-500/30'
+      background: 'bg-amber-100/70',
+      border: 'border-amber-200',
+      text: 'text-amber-700',
+      glow: 'bg-amber-200/70'
     }
   },
   {
@@ -55,10 +55,10 @@ export const MENU_ITEMS = [
     icon: Grid2X2,
     theme: {
       accent: 'emerald',
-      background: 'bg-emerald-500/10',
-      border: 'border-emerald-500/40',
-      text: 'text-emerald-200',
-      glow: 'shadow-emerald-500/30'
+      background: 'bg-emerald-100/70',
+      border: 'border-emerald-200',
+      text: 'text-emerald-700',
+      glow: 'bg-emerald-200/70'
     }
   }
 ];
