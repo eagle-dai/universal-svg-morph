@@ -9,6 +9,7 @@ import React, {
 import {
   ArrowLeft,
   ArrowLeftRight,
+  Cpu,
   Play,
   Settings2,
   Layers,
