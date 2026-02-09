@@ -27,8 +27,8 @@ const BASE_COLORS = {
 
 const TRANSFORMED_META = {
   label: '带 Transform',
-  sourceTransform: 'translate(-30 8) rotate(-20 100 100)',
-  targetTransform: 'translate(24 -6) rotate(18 100 100) scale(0.82)',
+  sourceTransform: 'translate(-32 6) rotate(-18 100 100)',
+  targetTransform: 'translate(28 -8) rotate(20 100 100) scale(0.8)',
   stageTransform: 'translate(-6 6) rotate(4 100 100) scale(0.9)'
 };
 
