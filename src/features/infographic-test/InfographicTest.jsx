@@ -141,7 +141,7 @@ const MorphingPath = ({
 
 export default function InfographicTest({ onBack }) {
   const [infographicSets, setInfographicSets] = useState([]);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [sourceIndex, setSourceIndex] = useState(0);
   const [targetIndex, setTargetIndex] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -199,7 +199,7 @@ export default function InfographicTest({ onBack }) {
     }).filter(Boolean);
 
     setInfographicSets(nextSets);
-    setActiveIndex(0);
+    setSourceIndex(0);
     setTargetIndex(nextSets.length > 1 ? 1 : 0);
     setIsLoading(false);
 
@@ -211,9 +211,10 @@ export default function InfographicTest({ onBack }) {
     };
   }, []);
 
-  const activeSet = infographicSets[activeIndex];
+  const activeSet = infographicSets[sourceIndex];
   const targetSet = infographicSets[targetIndex];
   const hasData = activeSet && targetSet;
+  const isSameSelection = sourceIndex === targetIndex;
 
   const maxPaths = hasData
     ? Math.max(activeSet.paths.length, targetSet.paths.length)
@@ -240,8 +241,13 @@ export default function InfographicTest({ onBack }) {
     });
   }, [hasData, maxPaths, activeSet, targetSet]);
 
+  useEffect(() => {
+    if (!hasData || isPlaying) return;
+    engineRef.current.renderStatic(0, 1);
+  }, [hasData, sourceIndex, targetIndex, isPlaying]);
+
   const handlePlay = () => {
-    if (!hasData) return;
+    if (!hasData || isSameSelection) return;
     setIsPlaying(true);
 
     if (timelineRef.current) {
@@ -251,7 +257,7 @@ export default function InfographicTest({ onBack }) {
     const tl = new Timeline({
       onComplete: () => {
         setIsPlaying(false);
-        setActiveIndex(targetIndex);
+        setSourceIndex(targetIndex);
       },
     });
 
@@ -311,14 +317,14 @@ export default function InfographicTest({ onBack }) {
                 Infographic Morphing
               </h2>
               <p className="text-xs text-slate-400">
-                选择目标模板后点击播放，观察 SVG 路径的形变效果。
+                选择起始与目标模板后点击播放，观察 SVG 路径的形变效果。
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={handlePlay}
-                disabled={!hasData || isPlaying}
+                disabled={!hasData || isPlaying || isSameSelection}
                 className="flex items-center gap-2 rounded-full border border-emerald-400/50 bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-100 transition hover:border-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Play size={14} />
@@ -346,7 +352,7 @@ export default function InfographicTest({ onBack }) {
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
                     <span className="rounded-full border border-slate-700 px-2 py-0.5">
-                      当前：{activeSet.label}
+                      起始：{activeSet.label}
                     </span>
                     <span className="rounded-full border border-slate-700 px-2 py-0.5">
                       目标：{targetSet.label}
@@ -357,7 +363,7 @@ export default function InfographicTest({ onBack }) {
                   </div>
                   <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/70 p-3">
                     <svg
-                      key={`${activeIndex}-${targetIndex}`}
+                      key={`${sourceIndex}-${targetIndex}`}
                       viewBox={activeSet.viewBox}
                       className="h-[360px] w-full"
                       aria-label="Infographic morphing preview"
@@ -388,6 +394,25 @@ export default function InfographicTest({ onBack }) {
             <div className="flex flex-col gap-4">
               <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
                 <h3 className="text-sm font-semibold text-slate-100">
+                  起始模板
+                </h3>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {infographicSets.map((item, index) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setSourceIndex(index)}
+                      className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                        sourceIndex === index
+                          ? 'border-sky-400 bg-sky-500/20 text-sky-100'
+                          : 'border-slate-700 bg-slate-900/60 text-slate-200 hover:border-slate-500'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+                <h3 className="mt-4 text-sm font-semibold text-slate-100">
                   目标模板
                 </h3>
                 <div className="mt-3 flex flex-wrap gap-2">
