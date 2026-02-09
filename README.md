@@ -73,7 +73,7 @@ SVG 的 d 属性指令各不相同（如 C 曲线对 L 直线）。为了实现�
   - generate\*: 各种复杂 SVG 路径生成器（城市、花朵、矩阵等）。
   - SHAPE_LIBRARY: 预设的图形数据仓库。
   - MorphingPath: 单个路径组件，负责初始化数据和注册 DOM 引用。
-- src/features/infographic-test/InfographicTest.jsx: Infographic SVG 测试页，占位用于接入 AntV Infographic 生成的 SVG 结果。
+- src/features/infographic-morph/InfographicMorph.jsx: Infographic SVG 形态页，占位用于接入 AntV Infographic 生成的 SVG 形态结果。
 
 ## 📦 如何使用
 

@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import EntryMenu from './pages/EntryMenu.jsx';
 import UniversalMorph from './features/universal-morph/UniversalMorph.jsx';
-import InfographicTest from './features/infographic-test/InfographicTest.jsx';
+import InfographicMorph from './features/infographic-morph/InfographicMorph.jsx';
 
 const VIEW_COMPONENTS = {
   'universal-morph': UniversalMorph,
-  'infographic-test': InfographicTest
+  'infographic-morph': InfographicMorph
 };
 
 export default function App() {
