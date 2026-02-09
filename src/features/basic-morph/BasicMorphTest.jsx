@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { ArrowLeft, Waves } from "lucide-react";
+import { Timeline } from "animejs";
 import {
   buildAnimatedPathD,
   buildStaticPathD,
@@ -25,36 +26,27 @@ const BASE_COLORS = {
   target: "#F97316",
 };
 
-const TRANSFORMED_META = {
-  label: "带 Transform",
-  sourceTransform: "translate(-45 6) rotate(-28 100 100)",
-  targetTransform: "translate(38 -8) rotate(30 100 100) scale(0.8)",
-  stageTransform: "translate(-6 6) rotate(4 100 100) scale(0.9)",
+// --- 1. 定义结构化的 Transform 数据 ---
+// 显式定义所有参数，避免插值歧义
+const TRANSFORM_DATA = {
+  source: { x: -45, y: 6, r: -28, cx: 100, cy: 100, s: 1 },
+  target: { x: 38, y: -8, r: 30, cx: 100, cy: 100, s: 0.8 },
 };
 
-const buildMorphLoop = ({ pathRef, interpolator, colorData, duration }) => {
-  if (!pathRef.current || !interpolator) return () => {};
-  let animationFrame = 0;
-  let startTime = performance.now();
+// 辅助：生成标准的 SVG transform 字符串
+const getTransformString = ({ x, y, r, cx, cy, s }) =>
+  `translate(${x} ${y}) rotate(${r} ${cx} ${cy}) scale(${s})`;
 
-  const renderFrame = (timestamp) => {
-    const progress = Math.min((timestamp - startTime) / duration, 1);
-    const d = buildAnimatedPathD(interpolator.a, interpolator.b, progress, 1);
-    const currentColor = lerpColor(colorData, progress);
-    pathRef.current.setAttribute("d", d);
-    pathRef.current.setAttribute("fill", currentColor);
-    pathRef.current.setAttribute("stroke", currentColor);
+// 辅助：简单的线性插值
+const lerp = (start, end, t) => start + (end - start) * t;
 
-    if (progress >= 1) {
-      return;
-    }
-
-    animationFrame = requestAnimationFrame(renderFrame);
-  };
-
-  animationFrame = requestAnimationFrame(renderFrame);
-
-  return () => cancelAnimationFrame(animationFrame);
+const TRANSFORMED_META = {
+  label: "带 Transform",
+  // 为预览图生成静态字符串
+  sourceTransform: getTransformString(TRANSFORM_DATA.source),
+  targetTransform: getTransformString(TRANSFORM_DATA.target),
+  // 将原始数值配置传给动画组件
+  config: TRANSFORM_DATA,
 };
 
 const SvgPreview = ({ label, path, color, transform }) => (
@@ -73,9 +65,10 @@ const SvgPreview = ({ label, path, color, transform }) => (
   </div>
 );
 
-const MorphStage = ({ transform }) => {
+const MorphStage = ({ transformConfig }) => {
   const pathRef = useRef(null);
-  const loopCleanupRef = useRef(null);
+  const timelineRef = useRef(null);
+
   const interpolator = useMemo(
     () =>
       createMorphInterpolator(BASE_SHAPES.source, BASE_SHAPES.target, {
@@ -84,23 +77,95 @@ const MorphStage = ({ transform }) => {
       }),
     [],
   );
+
   const colorData = useMemo(
     () => createColorLerp(BASE_COLORS.source, BASE_COLORS.target),
     [],
   );
 
+  // 初始化：设置静态初始状态
   useEffect(() => {
     if (!pathRef.current || !interpolator) return;
+
+    // 1. 设置初始 Path 和 Color
     pathRef.current.setAttribute("d", buildStaticPathD(interpolator.a, 1));
     pathRef.current.setAttribute("fill", BASE_COLORS.source);
     pathRef.current.setAttribute("stroke", BASE_COLORS.source);
+
+    // 2. 设置初始 Transform
+    if (transformConfig) {
+      pathRef.current.setAttribute(
+        "transform",
+        getTransformString(transformConfig.source),
+      );
+    } else {
+      pathRef.current.removeAttribute("transform");
+    }
+
     return () => {
-      if (loopCleanupRef.current) {
-        loopCleanupRef.current();
-        loopCleanupRef.current = null;
-      }
+      if (timelineRef.current) timelineRef.current.pause();
     };
-  }, [colorData, interpolator]);
+  }, [colorData, interpolator, transformConfig]);
+
+  const handlePlay = () => {
+    if (!pathRef.current || !interpolator) return;
+    if (timelineRef.current) timelineRef.current.pause();
+
+    const tl = new Timeline({
+      duration: MORPH_CONFIG.duration,
+      easing: "inOutQuad",
+    });
+
+    // 使用代理对象 t (0 -> 1)，在 onUpdate 中手动计算所有属性
+    const proxy = { t: 0 };
+
+    tl.add(
+      proxy,
+      {
+        t: 1,
+        onUpdate: () => {
+          const progress = proxy.t;
+
+          // A. Path & Color 插值
+          const d = buildAnimatedPathD(
+            interpolator.a,
+            interpolator.b,
+            progress,
+            1,
+          );
+          const currentColor = lerpColor(colorData, progress);
+          pathRef.current.setAttribute("d", d);
+          pathRef.current.setAttribute("fill", currentColor);
+          pathRef.current.setAttribute("stroke", currentColor);
+
+          // B. Transform 手动数值插值 (仅当配置存在时)
+          if (transformConfig) {
+            const { source: s, target: e } = transformConfig;
+
+            // 计算当前帧的各项数值
+            const currentTransform = {
+              x: lerp(s.x, e.x, progress),
+              y: lerp(s.y, e.y, progress),
+              r: lerp(s.r, e.r, progress),
+              cx: s.cx, // 中心点通常保持不变，或者也可以 lerp
+              cy: s.cy,
+              s: lerp(s.s, e.s, progress),
+            };
+
+            // 拼装字符串并应用
+            pathRef.current.setAttribute(
+              "transform",
+              getTransformString(currentTransform),
+            );
+          }
+        },
+      },
+      0,
+    );
+
+    tl.play();
+    timelineRef.current = tl;
+  };
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl">
@@ -110,18 +175,7 @@ const MorphStage = ({ transform }) => {
         </div>
         <button
           type="button"
-          onClick={() => {
-            if (!pathRef.current || !interpolator) return;
-            if (loopCleanupRef.current) {
-              loopCleanupRef.current();
-            }
-            loopCleanupRef.current = buildMorphLoop({
-              pathRef,
-              interpolator,
-              colorData,
-              duration: MORPH_CONFIG.duration,
-            });
-          }}
+          onClick={handlePlay}
           className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200 transition hover:border-emerald-400 hover:text-white"
         >
           开始 Morph
@@ -133,7 +187,12 @@ const MorphStage = ({ transform }) => {
             ref={pathRef}
             fill={BASE_COLORS.source}
             stroke={BASE_COLORS.source}
-            transform={transform}
+            // 初始静态渲染也使用同样的生成逻辑
+            transform={
+              transformConfig
+                ? getTransformString(transformConfig.source)
+                : undefined
+            }
           />
         </svg>
       </div>
@@ -141,31 +200,34 @@ const MorphStage = ({ transform }) => {
   );
 };
 
-const MorphRow = ({ title, transform }) => (
-  <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
-        <Waves size={16} className="text-emerald-400" />
-        {title}
+const MorphRow = ({ title, transformMeta }) => {
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+          <Waves size={16} className="text-emerald-400" />
+          {title}
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <SvgPreview
+            label="源 SVG 示例"
+            path={BASE_SHAPES.source}
+            color={BASE_COLORS.source}
+            transform={transformMeta?.sourceTransform}
+          />
+          <SvgPreview
+            label="目标 SVG 示例"
+            path={BASE_SHAPES.target}
+            color={BASE_COLORS.target}
+            transform={transformMeta?.targetTransform}
+          />
+        </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <SvgPreview
-          label="源 SVG 示例"
-          path={BASE_SHAPES.source}
-          color={BASE_COLORS.source}
-          transform={transform?.sourceTransform ?? transform}
-        />
-        <SvgPreview
-          label="目标 SVG 示例"
-          path={BASE_SHAPES.target}
-          color={BASE_COLORS.target}
-          transform={transform?.targetTransform ?? transform}
-        />
-      </div>
+      {/* 将数值配置 config 传给 Stage */}
+      <MorphStage transformConfig={transformMeta?.config} />
     </div>
-    <MorphStage transform={transform?.stageTransform ?? transform} />
-  </div>
-);
+  );
+};
 
 export default function BasicMorphTest({ onBack }) {
   return (
@@ -196,8 +258,11 @@ export default function BasicMorphTest({ onBack }) {
       </header>
 
       <main className="mx-auto w-full max-w-6xl space-y-10 px-6 py-10">
-        <MorphRow title="基础形态对比" transform={null} />
-        <MorphRow title={TRANSFORMED_META.label} transform={TRANSFORMED_META} />
+        <MorphRow title="基础形态对比" transformMeta={null} />
+        <MorphRow
+          title={TRANSFORMED_META.label}
+          transformMeta={TRANSFORMED_META}
+        />
       </main>
     </div>
   );
