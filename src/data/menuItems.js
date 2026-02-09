@@ -19,7 +19,7 @@ export const MENU_ITEMS = [
   {
     id: 'infographic-morph',
     title: 'Infographic SVG 形态',
-    description: '预留用于接入 AntV Infographic 生成的 SVG 形态样式。',
+    description: '基于 AntV Infographic 的 10 类典型 SVG 形态示例。',
     badge: '形态页面',
     cta: '进入形态页',
     icon: Image,
