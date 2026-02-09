@@ -25,7 +25,7 @@ const BASE_COLORS = {
 
 const TRANSFORMED_META = {
   label: '带 Transform',
-  transform: 'translate(6 -4) rotate(16 100 100) scale(0.92)'
+  transform: 'translate(-22 12) rotate(-28 100 100) scale(0.82)'
 };
 
 const buildMorphLoop = ({ pathRef, interpolator, colorData, duration }) => {
@@ -74,6 +74,7 @@ const SvgPreview = ({ label, path, color, transform }) => (
 
 const MorphStage = ({ transform }) => {
   const pathRef = useRef(null);
+  const loopCleanupRef = useRef(null);
   const interpolator = useMemo(
     () =>
       createMorphInterpolator(BASE_SHAPES.source, BASE_SHAPES.target, {
@@ -95,18 +96,38 @@ const MorphStage = ({ transform }) => {
     );
     pathRef.current.setAttribute('fill', BASE_COLORS.source);
     pathRef.current.setAttribute('stroke', BASE_COLORS.source);
-    return buildMorphLoop({
-      pathRef,
-      interpolator,
-      colorData,
-      duration: MORPH_CONFIG.duration
-    });
+    return () => {
+      if (loopCleanupRef.current) {
+        loopCleanupRef.current();
+        loopCleanupRef.current = null;
+      }
+    };
   }, [colorData, interpolator]);
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-2xl">
-      <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
-        Morph 动画
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+          Morph 动画
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (!pathRef.current || !interpolator) return;
+            if (loopCleanupRef.current) {
+              loopCleanupRef.current();
+            }
+            loopCleanupRef.current = buildMorphLoop({
+              pathRef,
+              interpolator,
+              colorData,
+              duration: MORPH_CONFIG.duration
+            });
+          }}
+          className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-200 transition hover:border-emerald-400 hover:text-white"
+        >
+          开始 Morph
+        </button>
       </div>
       <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
         <svg viewBox="0 0 200 200" className="h-48 w-full">
