@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@antv/infographic": "^0.2.13",
     "animejs": "^4.3.5",
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
