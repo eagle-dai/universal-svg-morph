@@ -153,17 +153,17 @@ const MorphRow = ({ title, transform }) => (
           label="源 SVG 示例"
           path={BASE_SHAPES.source}
           color={BASE_COLORS.source}
-          transform={transform?.source ?? transform}
+          transform={transform?.sourceTransform ?? transform}
         />
         <SvgPreview
           label="目标 SVG 示例"
           path={BASE_SHAPES.target}
           color={BASE_COLORS.target}
-          transform={transform?.target ?? transform}
+          transform={transform?.targetTransform ?? transform}
         />
       </div>
     </div>
-    <MorphStage transform={transform?.stage ?? transform} />
+    <MorphStage transform={transform?.stageTransform ?? transform} />
   </div>
 );
 
