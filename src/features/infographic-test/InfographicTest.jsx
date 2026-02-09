@@ -396,60 +396,78 @@ export default function InfographicTest({ onBack }) {
                 <h3 className="text-sm font-semibold text-slate-100">
                   起始模板
                 </h3>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <p className="mt-1 text-xs text-slate-400">
+                  从下方样式中选择 morphing 的起始图。
+                </p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                   {infographicSets.map((item, index) => (
                     <button
-                      key={item.id}
+                      key={`source-${item.id}`}
                       type="button"
                       onClick={() => setSourceIndex(index)}
-                      className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                      className={`group rounded-2xl border p-3 text-left transition ${
                         sourceIndex === index
-                          ? 'border-sky-400 bg-sky-500/20 text-sky-100'
-                          : 'border-slate-700 bg-slate-900/60 text-slate-200 hover:border-slate-500'
+                          ? 'border-sky-400/80 bg-sky-500/10 shadow-[0_0_0_1px_rgba(56,189,248,0.4)]'
+                          : 'border-slate-800 bg-slate-950/70 hover:border-slate-600'
                       }`}
                     >
-                      {item.label}
-                    </button>
-                  ))}
-                </div>
-                <h3 className="mt-4 text-sm font-semibold text-slate-100">
-                  目标模板
-                </h3>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {infographicSets.map((item, index) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => setTargetIndex(index)}
-                      className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
-                        targetIndex === index
-                          ? 'border-amber-400 bg-amber-500/20 text-amber-100'
-                          : 'border-slate-700 bg-slate-900/60 text-slate-200 hover:border-slate-500'
-                      }`}
-                    >
-                      {item.label}
+                      <div className="mb-2 flex items-center justify-between text-xs font-semibold text-slate-200">
+                        <span>{item.label}</span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] ${
+                            sourceIndex === index
+                              ? 'bg-sky-500/20 text-sky-200'
+                              : 'bg-slate-800 text-slate-400'
+                          }`}
+                        >
+                          起始
+                        </span>
+                      </div>
+                      <div
+                        className="h-24 w-full rounded-xl border border-slate-800/60 bg-slate-950/80 p-2 [&_svg]:h-full [&_svg]:w-full"
+                        dangerouslySetInnerHTML={{ __html: item.svgMarkup }}
+                      />
                     </button>
                   ))}
                 </div>
               </div>
+
               <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
                 <h3 className="text-sm font-semibold text-slate-100">
-                  原始 Infographic 预览
+                  目标模板
                 </h3>
-                <div className="mt-4 grid gap-3">
-                  {infographicSets.map((item) => (
-                    <div
-                      key={item.id}
-                      className="rounded-xl border border-slate-800 bg-slate-950/70 p-3"
+                <p className="mt-1 text-xs text-slate-400">
+                  从下方样式中选择 morphing 的目标图。
+                </p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                  {infographicSets.map((item, index) => (
+                    <button
+                      key={`target-${item.id}`}
+                      type="button"
+                      onClick={() => setTargetIndex(index)}
+                      className={`group rounded-2xl border p-3 text-left transition ${
+                        targetIndex === index
+                          ? 'border-amber-400/80 bg-amber-500/10 shadow-[0_0_0_1px_rgba(251,191,36,0.4)]'
+                          : 'border-slate-800 bg-slate-950/70 hover:border-slate-600'
+                      }`}
                     >
-                      <div className="mb-2 text-xs font-semibold text-slate-300">
-                        {item.label}
+                      <div className="mb-2 flex items-center justify-between text-xs font-semibold text-slate-200">
+                        <span>{item.label}</span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] ${
+                            targetIndex === index
+                              ? 'bg-amber-500/20 text-amber-200'
+                              : 'bg-slate-800 text-slate-400'
+                          }`}
+                        >
+                          目标
+                        </span>
                       </div>
                       <div
-                        className="h-32 w-full [&_svg]:h-full [&_svg]:w-full"
+                        className="h-24 w-full rounded-xl border border-slate-800/60 bg-slate-950/80 p-2 [&_svg]:h-full [&_svg]:w-full"
                         dangerouslySetInnerHTML={{ __html: item.svgMarkup }}
                       />
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
