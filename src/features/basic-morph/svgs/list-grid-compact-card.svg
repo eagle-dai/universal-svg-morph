@@ -1,0 +1,211 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24.923076923076923 -11.7 697.8461538461538 257.4"
+    font-family="Alibaba PuHuiTi" width="260px" height="200px" style="">
+    <defs data-element-type="btn-icon-defs">
+        <symbol xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 1024 1024" version="1.1" width="200"
+            height="200" id="btn-add-icon">
+            <path
+                d="M512 1024C229.216 1024 0 794.784 0 512S229.216 0 512 0s512 229.216 512 512-229.216 512-512 512z m0-960C264.576 64 64 264.576 64 512s200.576 448 448 448 448-200.576 448-448S759.424 64 512 64z m192 480h-160v160a32 32 0 0 1-64 0v-160h-160a32 32 0 0 1 0-64h160v-160a32 32 0 0 1 64 0v160h160a32 32 0 0 1 0 64z"
+                fill="#339900"></path>
+        </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1025 1024" version="1.1" width="200" height="200"
+            id="btn-remove-icon">
+            <path
+                d="M874.971429 149.942857C776.228571 54.857143 648.228571 0 512.914286 0S245.942857 54.857143 150.857143 149.942857c-201.142857 201.142857-201.142857 522.971429 0 724.114286C245.942857 969.142857 377.6 1024 512.914286 1024s266.971429-54.857143 362.057143-149.942857c201.142857-201.142857 201.142857-522.971429 0-724.114286m-51.2 672.914286C739.657143 906.971429 629.942857 950.857143 512.914286 950.857143s-226.742857-43.885714-310.857143-128c-171.885714-171.885714-171.885714-449.828571 0-621.714286C286.171429 117.028571 395.885714 73.142857 512.914286 73.142857s226.742857 43.885714 310.857143 128c171.885714 171.885714 171.885714 449.828571 0 621.714286"
+                fill="#E63C33"></path>
+            <path
+                d="M772.571429 475.428571H253.257143c-21.942857 0-36.571429 14.628571-36.571429 36.571429 0 10.971429 3.657143 18.285714 10.971429 25.6s14.628571 10.971429 25.6 10.971429H768.914286c21.942857 0 36.571429-14.628571 36.571428-36.571429s-14.628571-36.571429-32.914285-36.571429"
+                fill="#E63C33"></path>
+        </symbol>
+    </defs>
+    <defs>
+        <filter id="compact-shadow">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.15"></feDropShadow>
+        </filter>
+    </defs>
+    <g id="infographic-container" x="0" y="0" width="648" height="234">
+        <g x="217.5" y="0" width="213" height="90" transform="translate(217.5, 0)">
+            <g x="49.5" y="0" transform="translate(49.5, 0)" width="114" height="34">
+                <foreignObject overflow="visible" x="0" y="0" width="114" height="34" data-element-type="title"
+                    data-x="0" data-y="0" data-horizontal-align="CENTER" data-vertical-align="TOP"><span
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        style="overflow: visible; color: rgb(38, 38, 38); font-size: 24px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: flex-start center; align-items: flex-start;">Infographic</span>
+                </foreignObject>
+            </g>
+            <g x="0" y="42" transform="translate(0, 42)" width="213" height="48">
+                <foreignObject overflow="visible" x="0" y="0" width="213" height="48" data-element-type="desc"
+                    data-x="0" data-y="0" data-horizontal-align="CENTER" data-vertical-align="TOP"><span
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        style="overflow: visible; color: rgb(90, 90, 90); font-size: 16px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: flex-start center; align-items: flex-start;">Generated
+                        by @antv/infographic</span></foreignObject>
+            </g>
+        </g>
+        <g x="0" y="90" transform="translate(0, 90)">
+            <g data-element-type="items-group">
+                <g x="0" y="0">
+                    <rect x="0" y="0" width="200" height="60" fill="#ffffff" stroke="#ffffff" stroke-width="1" rx="6"
+                        ry="6" filter="url(#compact-shadow)" data-element-type="shape"></rect>
+                    <rect x="0" y="0" width="3" height="60" fill="#1783ff" rx="1.5" ry="1.5" data-element-type="shape">
+                    </rect>
+                    <g x="36" y="8" width="156" height="44" transform="translate(36, 8)">
+                        <g width="156" x="0" y="-0.5" height="17" transform="translate(0, -0.5)">
+                            <g width="124.80000000000001" height="17">
+                                <foreignObject overflow="visible" x="0" y="0" width="124.80000000000001" height="17"
+                                    data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                                    data-vertical-align="TOP" data-indexes="0"><span
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        style="overflow: visible; color: rgb(38, 38, 38); font-weight: bold; font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: flex-start; align-items: flex-start;">节点
+                                        1</span></foreignObject>
+                            </g>
+                            <g x="124.80000000000001" y="0" transform="translate(124.80000000000001, 0)"
+                                width="31.200000000000003" height="17">
+                                <foreignObject overflow="visible" x="0" y="0" width="31.200000000000003" height="17"
+                                    data-element-type="item-value" data-x="0" data-y="0" data-horizontal-align="RIGHT"
+                                    data-vertical-align="TOP" data-word-wrap="true" data-value="20" data-indexes="0">
+                                    <span xmlns="http://www.w3.org/1999/xhtml"
+                                        style="overflow: visible; color: rgb(23, 131, 255); font-weight: bold; font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: right; place-content: flex-start flex-end; align-items: flex-start;">20</span>
+                                </foreignObject>
+                            </g>
+                        </g>
+                        <g x="0" y="16.5" transform="translate(0, 16.5)" width="156" height="28">
+                            <foreignObject overflow="visible" x="0" y="0" width="156" height="28"
+                                data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                                data-vertical-align="MIDDLE" data-word-wrap="true" data-indexes="0"><span
+                                    xmlns="http://www.w3.org/1999/xhtml"
+                                    style="overflow: visible; color: rgb(90, 90, 90); font-size: 10px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: center flex-start; align-items: center;">关键信息
+                                    1</span></foreignObject>
+                        </g>
+                    </g>
+                </g>
+                <g x="224" y="0" transform="translate(224, 0)">
+                    <rect x="0" y="0" width="200" height="60" fill="#ffffff" stroke="#ffffff" stroke-width="1" rx="6"
+                        ry="6" filter="url(#compact-shadow)" data-element-type="shape"></rect>
+                    <rect x="0" y="0" width="3" height="60" fill="#00c9c9" rx="1.5" ry="1.5" data-element-type="shape">
+                    </rect>
+                    <g x="36" y="8" width="156" height="44" transform="translate(36, 8)">
+                        <g width="156" x="0" y="-0.5" height="17" transform="translate(0, -0.5)">
+                            <g width="124.80000000000001" height="17">
+                                <foreignObject overflow="visible" x="0" y="0" width="124.80000000000001" height="17"
+                                    data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                                    data-vertical-align="TOP" data-indexes="1"><span
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        style="overflow: visible; color: rgb(38, 38, 38); font-weight: bold; font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: flex-start; align-items: flex-start;">节点
+                                        2</span></foreignObject>
+                            </g>
+                            <g x="124.80000000000001" y="0" transform="translate(124.80000000000001, 0)"
+                                width="31.200000000000003" height="17">
+                                <foreignObject overflow="visible" x="0" y="0" width="31.200000000000003" height="17"
+                                    data-element-type="item-value" data-x="0" data-y="0" data-horizontal-align="RIGHT"
+                                    data-vertical-align="TOP" data-word-wrap="true" data-value="28" data-indexes="1">
+                                    <span xmlns="http://www.w3.org/1999/xhtml"
+                                        style="overflow: visible; color: rgb(0, 201, 201); font-weight: bold; font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: right; place-content: flex-start flex-end; align-items: flex-start;">28</span>
+                                </foreignObject>
+                            </g>
+                        </g>
+                        <g x="0" y="16.5" transform="translate(0, 16.5)" width="156" height="28">
+                            <foreignObject overflow="visible" x="0" y="0" width="156" height="28"
+                                data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                                data-vertical-align="MIDDLE" data-word-wrap="true" data-indexes="1"><span
+                                    xmlns="http://www.w3.org/1999/xhtml"
+                                    style="overflow: visible; color: rgb(90, 90, 90); font-size: 10px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: center flex-start; align-items: center;">关键信息
+                                    2</span></foreignObject>
+                        </g>
+                    </g>
+                </g>
+                <g x="448" y="0" transform="translate(448, 0)">
+                    <rect x="0" y="0" width="200" height="60" fill="#ffffff" stroke="#ffffff" stroke-width="1" rx="6"
+                        ry="6" filter="url(#compact-shadow)" data-element-type="shape"></rect>
+                    <rect x="0" y="0" width="3" height="60" fill="#f0884d" rx="1.5" ry="1.5" data-element-type="shape">
+                    </rect>
+                    <g x="36" y="8" width="156" height="44" transform="translate(36, 8)">
+                        <g width="156" x="0" y="-0.5" height="17" transform="translate(0, -0.5)">
+                            <g width="124.80000000000001" height="17">
+                                <foreignObject overflow="visible" x="0" y="0" width="124.80000000000001" height="17"
+                                    data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                                    data-vertical-align="TOP" data-indexes="2"><span
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        style="overflow: visible; color: rgb(38, 38, 38); font-weight: bold; font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: flex-start; align-items: flex-start;">节点
+                                        3</span></foreignObject>
+                            </g>
+                            <g x="124.80000000000001" y="0" transform="translate(124.80000000000001, 0)"
+                                width="31.200000000000003" height="17">
+                                <foreignObject overflow="visible" x="0" y="0" width="31.200000000000003" height="17"
+                                    data-element-type="item-value" data-x="0" data-y="0" data-horizontal-align="RIGHT"
+                                    data-vertical-align="TOP" data-word-wrap="true" data-value="36" data-indexes="2">
+                                    <span xmlns="http://www.w3.org/1999/xhtml"
+                                        style="overflow: visible; color: rgb(240, 136, 77); font-weight: bold; font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: right; place-content: flex-start flex-end; align-items: flex-start;">36</span>
+                                </foreignObject>
+                            </g>
+                        </g>
+                        <g x="0" y="16.5" transform="translate(0, 16.5)" width="156" height="28">
+                            <foreignObject overflow="visible" x="0" y="0" width="156" height="28"
+                                data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                                data-vertical-align="MIDDLE" data-word-wrap="true" data-indexes="2"><span
+                                    xmlns="http://www.w3.org/1999/xhtml"
+                                    style="overflow: visible; color: rgb(90, 90, 90); font-size: 10px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: center flex-start; align-items: center;">关键信息
+                                    3</span></foreignObject>
+                        </g>
+                    </g>
+                </g>
+                <g x="0" y="84" transform="translate(0, 84)">
+                    <rect x="0" y="0" width="200" height="60" fill="#ffffff" stroke="#ffffff" stroke-width="1" rx="6"
+                        ry="6" filter="url(#compact-shadow)" data-element-type="shape"></rect>
+                    <rect x="0" y="0" width="3" height="60" fill="#d580ff" rx="1.5" ry="1.5" data-element-type="shape">
+                    </rect>
+                    <g x="36" y="8" width="156" height="44" transform="translate(36, 8)">
+                        <g width="156" x="0" y="-0.5" height="17" transform="translate(0, -0.5)">
+                            <g width="124.80000000000001" height="17">
+                                <foreignObject overflow="visible" x="0" y="0" width="124.80000000000001" height="17"
+                                    data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                                    data-vertical-align="TOP" data-indexes="3"><span
+                                        xmlns="http://www.w3.org/1999/xhtml"
+                                        style="overflow: visible; color: rgb(38, 38, 38); font-weight: bold; font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: flex-start; align-items: flex-start;">节点
+                                        4</span></foreignObject>
+                            </g>
+                            <g x="124.80000000000001" y="0" transform="translate(124.80000000000001, 0)"
+                                width="31.200000000000003" height="17">
+                                <foreignObject overflow="visible" x="0" y="0" width="31.200000000000003" height="17"
+                                    data-element-type="item-value" data-x="0" data-y="0" data-horizontal-align="RIGHT"
+                                    data-vertical-align="TOP" data-word-wrap="true" data-value="44" data-indexes="3">
+                                    <span xmlns="http://www.w3.org/1999/xhtml"
+                                        style="overflow: visible; color: rgb(213, 128, 255); font-weight: bold; font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: right; place-content: flex-start flex-end; align-items: flex-start;">44</span>
+                                </foreignObject>
+                            </g>
+                        </g>
+                        <g x="0" y="16.5" transform="translate(0, 16.5)" width="156" height="28">
+                            <foreignObject overflow="visible" x="0" y="0" width="156" height="28"
+                                data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                                data-vertical-align="MIDDLE" data-word-wrap="true" data-indexes="3"><span
+                                    xmlns="http://www.w3.org/1999/xhtml"
+                                    style="overflow: visible; color: rgb(90, 90, 90); font-size: 10px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: center flex-start; align-items: center;">关键信息
+                                    4</span></foreignObject>
+                        </g>
+                    </g>
+                </g>
+            </g>
+            <g data-element-type="btns-group" width="0" height="0" display="none">
+                <rect fill="#F9C0C0" fill-opacity="0.3" width="20" height="20" data-indexes="0"
+                    data-element-type="btn-remove" x="90" y="60"></rect>
+                <rect fill="#B9EBCA" fill-opacity="0.3" width="20" height="20" data-indexes="1"
+                    data-element-type="btn-add" x="202" y="20"></rect>
+                <rect fill="#B9EBCA" fill-opacity="0.3" width="20" height="20" data-indexes="0"
+                    data-element-type="btn-add" x="-22" y="20"></rect>
+                <rect fill="#F9C0C0" fill-opacity="0.3" width="20" height="20" data-indexes="1"
+                    data-element-type="btn-remove" x="314" y="60"></rect>
+                <rect fill="#B9EBCA" fill-opacity="0.3" width="20" height="20" data-indexes="2"
+                    data-element-type="btn-add" x="426" y="20"></rect>
+                <rect fill="#F9C0C0" fill-opacity="0.3" width="20" height="20" data-indexes="2"
+                    data-element-type="btn-remove" x="538" y="60"></rect>
+                <rect fill="#B9EBCA" fill-opacity="0.3" width="20" height="20" data-indexes="3"
+                    data-element-type="btn-add" x="650" y="20"></rect>
+                <rect fill="#F9C0C0" fill-opacity="0.3" width="20" height="20" data-indexes="3"
+                    data-element-type="btn-remove" x="90" y="144"></rect>
+                <rect fill="#B9EBCA" fill-opacity="0.3" width="20" height="20" data-indexes="4"
+                    data-element-type="btn-add" x="202" y="104"></rect>
+                <rect fill="#B9EBCA" fill-opacity="0.3" width="20" height="20" data-indexes="3"
+                    data-element-type="btn-add" x="-22" y="104"></rect>
+                <rect fill="#B9EBCA" fill-opacity="0.3" width="20" height="20" data-indexes="4"
+                    data-element-type="btn-add" x="202" y="104"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

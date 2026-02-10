@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-41.153846153846146 -16.5 1152.3076923076924 363"
+    font-family="Alibaba PuHuiTi" width="260px" height="200px" style="">
+    <defs>
+        <linearGradient id="#1783ff-flipped-outer" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(209, 230, 255, 0.2)"></stop>
+            <stop offset="100%" stop-color="rgba(69, 156, 255, 0.8)"></stop>
+        </linearGradient>
+        <linearGradient id="#1783ff-flipped-inner" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(197, 224, 255, 0.32)"></stop>
+            <stop offset="100%" stop-color="rgba(127, 187, 255, 0.4)"></stop>
+        </linearGradient>
+        <linearGradient id="#00c9c9-normal-outer" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="rgba(204, 244, 244, 0.2)"></stop>
+            <stop offset="100%" stop-color="rgba(51, 212, 212, 0.8)"></stop>
+        </linearGradient>
+        <linearGradient id="#00c9c9-normal-inner" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="rgba(191, 242, 242, 0.32)"></stop>
+            <stop offset="100%" stop-color="rgba(115, 225, 225, 0.4)"></stop>
+        </linearGradient>
+        <filter id="drop-shadow-#1783ff" x="-25%" y="-25%" width="200%" height="200%">
+            <feDropShadow dx="4" dy="4" stdDeviation="4" flood-color="#1783ff" flood-opacity="0.8"></feDropShadow>
+        </filter>
+        <linearGradient id="linear-gradient-white-top-bottom" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff"></stop>
+            <stop offset="100%" stop-color="#ffffff33"></stop>
+        </linearGradient>
+        <filter id="drop-shadow-#00c9c9" x="-25%" y="-25%" width="200%" height="200%">
+            <feDropShadow dx="4" dy="4" stdDeviation="4" flood-color="#00c9c9" flood-opacity="0.8"></feDropShadow>
+        </filter>
+        <linearGradient id="split-line-linear-gradient-left" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#1783FF"></stop>
+            <stop offset="100%" stop-color="#fff"></stop>
+        </linearGradient>
+        <linearGradient id="split-line-linear-gradient-right" x1="100%" y1="0%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#00C9C9"></stop>
+            <stop offset="100%" stop-color="#fff"></stop>
+        </linearGradient>
+    </defs>
+    <g id="infographic-container" x="0" y="0" width="1070" height="330">
+        <g x="428.5" y="0" width="213" height="90" transform="translate(428.5, 0)">
+            <g x="49.5" y="0" transform="translate(49.5, 0)" width="114" height="34">
+                <foreignObject overflow="visible" x="0" y="0" width="114" height="34" data-element-type="title"
+                    data-x="0" data-y="0" data-horizontal-align="CENTER" data-vertical-align="TOP"><span
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        style="overflow: visible; color: rgb(38, 38, 38); font-size: 24px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: flex-start center; align-items: flex-start;">Infographic</span>
+                </foreignObject>
+            </g>
+            <g x="0" y="42" transform="translate(0, 42)" width="213" height="48">
+                <foreignObject overflow="visible" x="0" y="0" width="213" height="48" data-element-type="desc"
+                    data-x="0" data-y="0" data-horizontal-align="CENTER" data-vertical-align="TOP"><span
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        style="overflow: visible; color: rgb(90, 90, 90); font-size: 16px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: flex-start center; align-items: flex-start;">Generated
+                        by @antv/infographic</span></foreignObject>
+            </g>
+        </g>
+        <g x="0" y="90" transform="translate(0, 90)">
+            <g data-element-type="items-group">
+                <g x="305" y="0" width="240" transform="translate(305, 0)">
+                    <ellipse width="240" height="240" fill="url(##1783ff-flipped-outer)" data-element-type="shape"
+                        cx="120" cy="120" rx="120" ry="120"></ellipse>
+                    <ellipse x="36" y="36" width="168" height="168" fill="url(##1783ff-flipped-inner)" stroke="#FFFFFF"
+                        stroke-width="1" data-element-type="shape" cx="120" cy="120" rx="84" ry="84"></ellipse>
+                    <g x="60.603030380330004" y="60.603030380330004"
+                        transform="translate(60.603030380330004, 60.603030380330004)" width="118.79393923933999"
+                        height="118.79393923933999">
+                        <foreignObject overflow="visible" x="0" y="0" width="118.79393923933999"
+                            height="118.79393923933999" data-element-type="item-label" data-x="0" data-y="0"
+                            data-horizontal-align="CENTER" data-vertical-align="MIDDLE" data-indexes="0"><span
+                                xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(0, 118, 252); font-weight: 500; font-size: 18px; line-height: 1.1; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: center; align-items: center;">优势</span>
+                        </foreignObject>
+                    </g>
+                </g>
+                <g x="525" y="0" width="240" transform="translate(525, 0)">
+                    <ellipse width="240" height="240" fill="url(##00c9c9-normal-outer)" data-element-type="shape"
+                        cx="120" cy="120" rx="120" ry="120"></ellipse>
+                    <ellipse x="36" y="36" width="168" height="168" fill="url(##00c9c9-normal-inner)" stroke="#FFFFFF"
+                        stroke-width="1" data-element-type="shape" cx="120" cy="120" rx="84" ry="84"></ellipse>
+                    <g x="60.603030380330004" y="60.603030380330004"
+                        transform="translate(60.603030380330004, 60.603030380330004)" width="118.79393923933999"
+                        height="118.79393923933999">
+                        <foreignObject overflow="visible" x="0" y="0" width="118.79393923933999"
+                            height="118.79393923933999" data-element-type="item-label" data-x="0" data-y="0"
+                            data-horizontal-align="CENTER" data-vertical-align="MIDDLE" data-indexes="1"><span
+                                xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(0, 175, 175); font-weight: 500; font-size: 18px; line-height: 1.1; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: center; align-items: center;">劣势</span>
+                        </foreignObject>
+                    </g>
+                </g>
+                <g x="0" y="24" transform="translate(0, 24)">
+                    <rect x="0" y="0" width="120" height="36" fill="#1783ff1a" stroke="#1783ff" rx="18" ry="18"
+                        filter="url(#drop-shadow-#1783ff)" data-element-type="shape"></rect>
+                    <rect x="0" y="0" width="120" height="36" fill="url(#linear-gradient-white-top-bottom)"
+                        opacity="0.7" rx="18" ry="18"></rect>
+                    <g width="120" height="36">
+                        <foreignObject overflow="visible" x="0" y="0" width="120" height="36"
+                            data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="CENTER"
+                            data-vertical-align="MIDDLE" data-indexes="0,0"><span xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(38, 38, 38); font-weight: 500; font-size: 14px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: center; align-items: center;">优势
+                                1</span></foreignObject>
+                    </g>
+                    <g x="0" y="52" transform="translate(0, 52)" width="300" height="34">
+                        <foreignObject overflow="visible" x="0" y="0" width="300" height="34"
+                            data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                            data-vertical-align="TOP" data-word-wrap="true" data-indexes="0,0"><span
+                                xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(90, 90, 90); font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: flex-start; align-items: flex-start;">关键信息
+                                1</span></foreignObject>
+                    </g>
+                </g>
+                <g x="0" y="130" transform="translate(0, 130)">
+                    <rect x="0" y="0" width="120" height="36" fill="#1783ff1a" stroke="#1783ff" rx="18" ry="18"
+                        filter="url(#drop-shadow-#1783ff)" data-element-type="shape"></rect>
+                    <rect x="0" y="0" width="120" height="36" fill="url(#linear-gradient-white-top-bottom)"
+                        opacity="0.7" rx="18" ry="18"></rect>
+                    <g width="120" height="36">
+                        <foreignObject overflow="visible" x="0" y="0" width="120" height="36"
+                            data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="CENTER"
+                            data-vertical-align="MIDDLE" data-indexes="0,1"><span xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(38, 38, 38); font-weight: 500; font-size: 14px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: center; align-items: center;">优势
+                                2</span></foreignObject>
+                    </g>
+                    <g x="0" y="52" transform="translate(0, 52)" width="300" height="34">
+                        <foreignObject overflow="visible" x="0" y="0" width="300" height="34"
+                            data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                            data-vertical-align="TOP" data-word-wrap="true" data-indexes="0,1"><span
+                                xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(90, 90, 90); font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: flex-start; align-items: flex-start;">关键信息
+                                2</span></foreignObject>
+                    </g>
+                </g>
+                <g x="770" y="24" transform="translate(770, 24)">
+                    <rect x="180" y="0" width="120" height="36" fill="#00c9c91a" stroke="#00c9c9" rx="18" ry="18"
+                        filter="url(#drop-shadow-#00c9c9)" data-element-type="shape"></rect>
+                    <rect x="180" y="0" width="120" height="36" fill="url(#linear-gradient-white-top-bottom)"
+                        opacity="0.7" rx="18" ry="18"></rect>
+                    <g x="180" y="0" transform="translate(180, 0)" width="120" height="36">
+                        <foreignObject overflow="visible" x="0" y="0" width="120" height="36"
+                            data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="CENTER"
+                            data-vertical-align="MIDDLE" data-indexes="1,0"><span xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(38, 38, 38); font-weight: 500; font-size: 14px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: center; align-items: center;">劣势
+                                1</span></foreignObject>
+                    </g>
+                    <g x="0" y="52" transform="translate(0, 52)" width="300" height="34">
+                        <foreignObject overflow="visible" x="0" y="0" width="300" height="34"
+                            data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="RIGHT"
+                            data-vertical-align="TOP" data-word-wrap="true" data-indexes="1,0"><span
+                                xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(90, 90, 90); font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: right; place-content: flex-start flex-end; align-items: flex-start;">关键信息
+                                1</span></foreignObject>
+                    </g>
+                </g>
+                <g x="770" y="130" transform="translate(770, 130)">
+                    <rect x="180" y="0" width="120" height="36" fill="#00c9c91a" stroke="#00c9c9" rx="18" ry="18"
+                        filter="url(#drop-shadow-#00c9c9)" data-element-type="shape"></rect>
+                    <rect x="180" y="0" width="120" height="36" fill="url(#linear-gradient-white-top-bottom)"
+                        opacity="0.7" rx="18" ry="18"></rect>
+                    <g x="180" y="0" transform="translate(180, 0)" width="120" height="36">
+                        <foreignObject overflow="visible" x="0" y="0" width="120" height="36"
+                            data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="CENTER"
+                            data-vertical-align="MIDDLE" data-indexes="1,1"><span xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(38, 38, 38); font-weight: 500; font-size: 14px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: center; align-items: center;">劣势
+                                2</span></foreignObject>
+                    </g>
+                    <g x="0" y="52" transform="translate(0, 52)" width="300" height="34">
+                        <foreignObject overflow="visible" x="0" y="0" width="300" height="34"
+                            data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="RIGHT"
+                            data-vertical-align="TOP" data-word-wrap="true" data-indexes="1,1"><span
+                                xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(90, 90, 90); font-size: 12px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: right; place-content: flex-start flex-end; align-items: flex-start;">关键信息
+                                2</span></foreignObject>
+                    </g>
+                </g>
+            </g>
+            <g width="0" height="0">
+                <rect x="0" y="110" width="300" height="1" fill="url(#split-line-linear-gradient-left)"></rect>
+                <rect x="0" y="216" width="300" height="1" fill="url(#split-line-linear-gradient-left)"></rect>
+                <rect x="770" y="110" width="300" height="1" fill="url(#split-line-linear-gradient-right)"></rect>
+                <rect x="770" y="216" width="300" height="1" fill="url(#split-line-linear-gradient-right)"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

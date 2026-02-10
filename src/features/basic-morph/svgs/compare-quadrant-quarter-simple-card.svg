@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-13.076923076923077 -21.5 366.1538461538462 473"
+    font-family="Alibaba PuHuiTi" width="260px" height="200px" style="">
+    <g id="infographic-container" x="0" y="0" width="340" height="430">
+        <g x="63.5" y="0" width="213" height="90" transform="translate(63.5, 0)">
+            <g x="49.5" y="0" transform="translate(49.5, 0)" width="114" height="34">
+                <foreignObject overflow="visible" x="0" y="0" width="114" height="34" data-element-type="title"
+                    data-x="0" data-y="0" data-horizontal-align="CENTER" data-vertical-align="TOP"><span
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        style="overflow: visible; color: rgb(38, 38, 38); font-size: 24px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: flex-start center; align-items: flex-start;">Infographic</span>
+                </foreignObject>
+            </g>
+            <g x="0" y="42" transform="translate(0, 42)" width="213" height="48">
+                <foreignObject overflow="visible" x="0" y="0" width="213" height="48" data-element-type="desc"
+                    data-x="0" data-y="0" data-horizontal-align="CENTER" data-vertical-align="TOP"><span
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        style="overflow: visible; color: rgb(90, 90, 90); font-size: 16px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: center; place-content: flex-start center; align-items: flex-start;">Generated
+                        by @antv/infographic</span></foreignObject>
+            </g>
+        </g>
+        <g width="340" height="340" x="0" y="90" transform="translate(0, 90)">
+            <path d="M 0 170 L 340 170" stroke="#D9D9D9" stroke-width="1" stroke-dasharray="4,2" fill="none"
+                data-element-type="shape"></path>
+            <g data-element-type="shapes-group" transform="translate(340, 170)">
+                <path d="M 0 0 L -5 -2.5" stroke="#D9D9D9" stroke-width="1" fill="none"></path>
+                <path d="M 0 0 L -5 2.5" stroke="#D9D9D9" stroke-width="1" fill="none"></path>
+            </g>
+            <g data-element-type="shapes-group" transform="translate(0, 170)">
+                <path d="M 0 0 L 5 -2.5" stroke="#D9D9D9" stroke-width="1" fill="none"></path>
+                <path d="M 0 0 L 5 2.5" stroke="#D9D9D9" stroke-width="1" fill="none"></path>
+            </g>
+            <path d="M 170 0 L 170 340" stroke="#D9D9D9" stroke-width="1" stroke-dasharray="4,2" fill="none"
+                data-element-type="shape"></path>
+            <g data-element-type="shapes-group" transform="translate(170, 0)">
+                <path d="M 0 0 L -2.5 5" stroke="#D9D9D9" stroke-width="1" fill="none"></path>
+                <path d="M 0 0 L 2.5 5" stroke="#D9D9D9" stroke-width="1" fill="none"></path>
+            </g>
+            <g data-element-type="shapes-group" transform="translate(170, 340)">
+                <path d="M 0 0 L -2.5 -5" stroke="#D9D9D9" stroke-width="1" fill="none"></path>
+                <path d="M 0 0 L 2.5 -5" stroke="#D9D9D9" stroke-width="1" fill="none"></path>
+            </g>
+            <g data-element-type="items-group">
+                <g x="10" y="10" transform="translate(10, 10)">
+                    <path
+                        d="   M 16 0   L 134 0   Q 150 0 150 16   L 150 150   L 16 150   Q 0 150 0 134   L 0 16   Q 0 0 16 0   Z "
+                        x="0" y="0" width="150" height="150" fill="#1783ff" data-element-type="shape"
+                        transform="translate(0, 0)"></path>
+                    <g x="20" y="58" transform="translate(20, 58)" width="110" height="20">
+                        <foreignObject overflow="visible" x="0" y="0" width="110" height="20"
+                            data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                            data-vertical-align="TOP" data-indexes="0"><span xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(255, 255, 255); font-weight: bold; font-size: 14px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: flex-start; align-items: flex-start;">优势</span>
+                        </foreignObject>
+                    </g>
+                    <g x="20" y="88" transform="translate(20, 88)" width="110" height="31">
+                        <foreignObject overflow="visible" x="0" y="0" width="110" height="31"
+                            data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="LEFT"
+                            data-vertical-align="TOP" data-word-wrap="true" data-indexes="0"><span
+                                xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(255, 255, 255); font-size: 11px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: left; place-content: flex-start; align-items: flex-start;">左侧要点</span>
+                        </foreignObject>
+                    </g>
+                </g>
+                <g x="180" y="10" transform="translate(180, 10)">
+                    <path
+                        d="   M 16 0   L 134 0   Q 150 0 150 16   L 150 134   Q 150 150 134 150   L 0 150   L 0 16   Q 0 0 16 0   Z "
+                        x="0" y="0" width="150" height="150" fill="#00c9c9" data-element-type="shape"
+                        transform="translate(0, 0)"></path>
+                    <g x="20" y="58" transform="translate(20, 58)" width="110" height="20">
+                        <foreignObject overflow="visible" x="0" y="0" width="110" height="20"
+                            data-element-type="item-label" data-x="0" data-y="0" data-horizontal-align="RIGHT"
+                            data-vertical-align="TOP" data-indexes="1"><span xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(255, 255, 255); font-weight: bold; font-size: 14px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: right; place-content: flex-start flex-end; align-items: flex-start;">劣势</span>
+                        </foreignObject>
+                    </g>
+                    <g x="20" y="88" transform="translate(20, 88)" width="110" height="31">
+                        <foreignObject overflow="visible" x="0" y="0" width="110" height="31"
+                            data-element-type="item-desc" data-x="0" data-y="0" data-horizontal-align="RIGHT"
+                            data-vertical-align="TOP" data-word-wrap="true" data-indexes="1"><span
+                                xmlns="http://www.w3.org/1999/xhtml"
+                                style="overflow: visible; color: rgb(255, 255, 255); font-size: 11px; line-height: 1.4; width: 100%; height: 100%; display: flex; flex-wrap: wrap; word-break: break-word; white-space: pre-wrap; text-align: right; place-content: flex-start flex-end; align-items: flex-start;">右侧要点</span>
+                        </foreignObject>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
