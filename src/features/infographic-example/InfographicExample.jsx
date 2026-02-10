@@ -1,11 +1,43 @@
 import { ArrowLeft, Sparkles } from 'lucide-react';
-import { Infographic, getPalette, getTemplate } from '@antv/infographic';
+import { Infographic, getPalette, getTemplate, getTemplates } from '@antv/infographic';
 import { memo, useEffect, useMemo, useRef } from 'react';
-import {
-  FALLBACK_PALETTE,
-  INFOGRAPHIC_TEMPLATES,
-  buildInfographicData
-} from '../infographic-morph/infographicLibrary.js';
+import { FALLBACK_PALETTE, buildInfographicData } from '../infographic-morph/infographicLibrary.js';
+
+const CATEGORY_LABELS = {
+  list: '列表型',
+  sequence: '顺序型',
+  compare: '对比型',
+  relation: '关系型',
+  hierarchy: '层级型',
+  chart: '图表型'
+};
+
+const toTitle = (templateId) =>
+  templateId
+    .split('-')
+    .slice(1)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(' ');
+
+const toDescription = (templateId) => {
+  const [category] = templateId.split('-');
+  const categoryLabel = CATEGORY_LABELS[category] ?? '通用';
+  return `${categoryLabel}模板，来自 @antv/infographic。`;
+};
+
+const buildTemplateSpec = (templateId) => {
+  const [category = 'general'] = templateId.split('-');
+  const defaultCount = category === 'compare' ? 2 : 4;
+
+  return {
+    id: templateId,
+    templateId,
+    title: toTitle(templateId),
+    description: toDescription(templateId),
+    tags: [CATEGORY_LABELS[category] ?? '通用', category],
+    itemCount: defaultCount
+  };
+};
 
 const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
   const containerRef = useRef(null);
@@ -72,12 +104,13 @@ const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
 export default function InfographicExample({ onBack }) {
   const templates = useMemo(
     () =>
-      INFOGRAPHIC_TEMPLATES.filter((spec) => getTemplate(spec.templateId)).map(
-        (spec) => ({
+      getTemplates()
+        .filter((templateId) => getTemplate(templateId))
+        .map((templateId) => buildTemplateSpec(templateId))
+        .map((spec) => ({
           ...spec,
           data: buildInfographicData(spec.templateId, spec.itemCount)
-        })
-      ),
+        })),
     []
   );
 
@@ -102,7 +135,7 @@ export default function InfographicExample({ onBack }) {
             </h1>
           </div>
           <p className="text-sm text-slate-500">
-            直接渲染 @antv/infographic 模板，快速查看常见信息图谱的视觉样式。
+            直接渲染 @antv/infographic 全量模板，快速查看各类信息图谱的视觉样式。
           </p>
         </div>
       </header>
