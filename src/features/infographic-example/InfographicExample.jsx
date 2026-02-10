@@ -1,6 +1,6 @@
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Infographic, getPalette, getTemplate, getTemplates } from '@antv/infographic';
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { FALLBACK_PALETTE, buildInfographicData } from '../infographic-morph/infographicLibrary.js';
 
 const CATEGORY_LABELS = {
@@ -39,11 +39,8 @@ const buildTemplateSpec = (templateId) => {
   };
 };
 
-const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
+const InfographicCanvas = memo(({ templateId, data, width, height, padding }) => {
   const containerRef = useRef(null);
-
-  const PREVIEW_WIDTH = 360;
-  const PREVIEW_HEIGHT = 260;
 
   const palette = useMemo(
     () => getPalette('antv') ?? FALLBACK_PALETTE,
@@ -60,9 +57,9 @@ const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
       container,
       template: templateId,
       data,
-      width: PREVIEW_WIDTH,
-      height: PREVIEW_HEIGHT,
-      padding: 10,
+      width,
+      height,
+      padding,
       themeConfig: {
         palette
       }
@@ -74,10 +71,17 @@ const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
       infographic.destroy();
       container.innerHTML = '';
     };
-  }, [PREVIEW_HEIGHT, PREVIEW_WIDTH, data, palette, templateId]);
+  }, [data, height, padding, palette, templateId, width]);
+
+  return <div ref={containerRef} className="h-full w-full" />;
+});
+
+const PreviewCard = memo(({ templateId, title, description, tags, data, onOpen }) => {
+  const PREVIEW_WIDTH = 360;
+  const PREVIEW_HEIGHT = 260;
 
   return (
-    <article className="flex h-full flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="flex h-full flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-emerald-300 hover:shadow-md">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
@@ -97,14 +101,35 @@ const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
           </span>
         ))}
       </div>
-      <div className="flex flex-1 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
-        <div ref={containerRef} className="h-[260px] w-[360px] max-w-full" />
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onOpen}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onOpen();
+          }
+        }}
+        className="group flex flex-1 cursor-zoom-in items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 outline-none transition hover:border-emerald-200 focus-visible:ring-2 focus-visible:ring-emerald-500"
+      >
+        <div className="h-[260px] w-[360px] max-w-full">
+          <InfographicCanvas
+            templateId={templateId}
+            data={data}
+            width={PREVIEW_WIDTH}
+            height={PREVIEW_HEIGHT}
+            padding={10}
+          />
+        </div>
       </div>
     </article>
   );
 });
 
 export default function InfographicExample({ onBack }) {
+  const [activeTemplateId, setActiveTemplateId] = useState(null);
+
   const templates = useMemo(
     () =>
       getTemplates()
@@ -116,6 +141,24 @@ export default function InfographicExample({ onBack }) {
         })),
     []
   );
+
+  const activeTemplate = useMemo(
+    () => templates.find((template) => template.id === activeTemplateId) ?? null,
+    [activeTemplateId, templates]
+  );
+
+  useEffect(() => {
+    if (!activeTemplate) return undefined;
+
+    const handleKeydown = (event) => {
+      if (event.key === 'Escape') {
+        setActiveTemplateId(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [activeTemplate]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -153,10 +196,48 @@ export default function InfographicExample({ onBack }) {
               description={item.description}
               tags={item.tags}
               data={item.data}
+              onOpen={() => setActiveTemplateId(item.id)}
             />
           ))}
         </div>
       </main>
+
+      {activeTemplate ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 px-4 py-6 backdrop-blur-sm"
+          onClick={() => setActiveTemplateId(null)}
+        >
+          <div
+            className="w-full max-w-[1080px] rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">{activeTemplate.title}</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  已进入放大预览，按 ESC 键或点击遮罩返回。
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveTemplateId(null)}
+                className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-emerald-300 hover:text-emerald-600"
+              >
+                关闭
+              </button>
+            </div>
+            <div className="h-[75vh] min-h-[480px] rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <InfographicCanvas
+                templateId={activeTemplate.templateId}
+                data={activeTemplate.data}
+                width={960}
+                height={640}
+                padding={18}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
