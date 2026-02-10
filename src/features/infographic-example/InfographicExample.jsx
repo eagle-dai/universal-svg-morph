@@ -12,6 +12,44 @@ const CATEGORY_LABELS = {
   chart: '图表型'
 };
 
+const CATEGORY_GUIDE = {
+  list: {
+    useCase: '用于展示项目清单、功能分组、价格套餐、要点汇总等平铺信息。',
+    dataFormat: '通常是多条并列条目，建议每条包含 title / value / description / icon。',
+    cautions: '控制每个卡片文案长度，避免列表项过多导致可读性下降。'
+  },
+  sequence: {
+    useCase: '用于说明流程步骤、时间线、阶段路径、任务执行顺序。',
+    dataFormat: '按顺序组织数组数据，建议包含 step、title、desc、time 等字段。',
+    cautions: '顺序必须明确，步骤数量过多时建议拆分为多段展示。'
+  },
+  compare: {
+    useCase: '用于对比方案差异、优缺点、版本能力、竞品特征。',
+    dataFormat: '至少两组可对照对象，字段结构保持一致，便于横向比对。',
+    cautions: '确保比较维度统一，避免出现口径不一致的指标。'
+  },
+  relation: {
+    useCase: '用于展示实体之间的关联关系，如因果链路、网络关系、依赖图。',
+    dataFormat: '常见为 nodes + edges 或主从关系集合，可附带关系说明字段。',
+    cautions: '注意关系方向和层级语义，避免连接线过多造成视觉噪声。'
+  },
+  hierarchy: {
+    useCase: '用于组织结构、分层体系、树形分类、能力分解。',
+    dataFormat: '树状或父子层级数据，建议包含 id、parentId、name、value。',
+    cautions: '层级不宜过深，建议突出主干结构并弱化次要分支。'
+  },
+  chart: {
+    useCase: '用于定量分析，如趋势变化、占比结构、分类统计、指标对比。',
+    dataFormat: '适合数值型数据，常见包含 category、value、series、time。',
+    cautions: '明确单位和口径，保证颜色映射在多个图表之间保持一致。'
+  },
+  general: {
+    useCase: '通用信息表达场景，可作为内容排版的基础图谱。',
+    dataFormat: '基础字段建议包含标题、描述、标签和关键数值。',
+    cautions: '优先保证信息层次清晰，避免同时堆叠过多视觉元素。'
+  }
+};
+
 const toTitle = (templateId) =>
   templateId
     .split('-')
@@ -28,14 +66,26 @@ const toDescription = (templateId) => {
 const buildTemplateSpec = (templateId) => {
   const [category = 'general'] = templateId.split('-');
   const defaultCount = category === 'compare' ? 2 : 4;
+  const guide = CATEGORY_GUIDE[category] ?? CATEGORY_GUIDE.general;
 
   return {
     id: templateId,
     templateId,
     title: toTitle(templateId),
     description: toDescription(templateId),
+    category,
     tags: [CATEGORY_LABELS[category] ?? '通用', category],
-    itemCount: defaultCount
+    itemCount: defaultCount,
+    details: {
+      type: CATEGORY_LABELS[category] ?? '通用',
+      useCase: guide.useCase,
+      dataFormat: guide.dataFormat,
+      cautions: guide.cautions,
+      other:
+        category === 'chart'
+          ? '图表类模板通常对数值字段更敏感，建议优先准备干净、完整的指标数据。'
+          : null
+    }
   };
 };
 
@@ -256,6 +306,32 @@ export default function InfographicExample({ onBack }) {
                 height={activeRenderSize?.height ?? 500}
                 padding={18}
               />
+            </div>
+            <div className="mt-4 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-2">
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">类型</h3>
+                <p className="mt-1 text-sm text-slate-700">{activeTemplate.details.type}</p>
+              </div>
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">适合什么场景</h3>
+                <p className="mt-1 text-sm text-slate-700">{activeTemplate.details.useCase}</p>
+              </div>
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">输入数据格式</h3>
+                <p className="mt-1 text-sm text-slate-700">{activeTemplate.details.dataFormat}</p>
+              </div>
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">特别注意点</h3>
+                <p className="mt-1 text-sm text-slate-700">{activeTemplate.details.cautions}</p>
+              </div>
+              {activeTemplate.details.other ? (
+                <div className="md:col-span-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    其它重要信息
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-700">{activeTemplate.details.other}</p>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
