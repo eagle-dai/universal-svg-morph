@@ -12,6 +12,45 @@ const CATEGORY_LABELS = {
   chart: '图表型'
 };
 
+const SEGMENT_LABELS = {
+  compact: '紧凑',
+  plain: '基础',
+  simple: '简洁',
+  animated: '动效',
+  rounded: '圆角',
+  quarter: '四分象限',
+  left: '左侧',
+  right: '右侧',
+  top: '顶部',
+  bottom: '底部',
+  lr: '左到右',
+  rl: '右到左',
+  tb: '上到下',
+  bt: '下到上',
+  flow: '流程',
+  timeline: '时间线',
+  steps: '步骤',
+  hierarchy: '层级',
+  relation: '关系',
+  circle: '圆形',
+  grid: '网格',
+  pie: '饼图',
+  donut: '环图',
+  pyramid: '金字塔',
+  compare: '对比',
+  icon: '图标',
+  node: '节点',
+  badge: '徽标',
+  card: '卡片',
+  capsule: '胶囊',
+  column: '柱状图',
+  list: '列表',
+  chart: '图表',
+  sequence: '序列',
+  dagre: '自动布局',
+  text: '文本'
+};
+
 const CATEGORY_GUIDE = {
   list: {
     useCase: '用于展示项目清单、功能分组、价格套餐、要点汇总等平铺信息。',
@@ -63,6 +102,17 @@ const toDescription = (templateId) => {
   return `${categoryLabel}模板，来自 @antv/infographic。`;
 };
 
+const toChineseTitle = (templateId) => {
+  const translatedSegments = templateId
+    .split('-')
+    .slice(1)
+    .map((segment) => SEGMENT_LABELS[segment] ?? segment.toUpperCase());
+
+  return translatedSegments.length > 0
+    ? translatedSegments.join(' · ')
+    : '通用信息图模板';
+};
+
 const buildTemplateSpec = (templateId) => {
   const [category = 'general'] = templateId.split('-');
   const defaultCount = category === 'compare' ? 2 : 4;
@@ -72,6 +122,7 @@ const buildTemplateSpec = (templateId) => {
     id: templateId,
     templateId,
     title: toTitle(templateId),
+    titleZh: toChineseTitle(templateId),
     description: toDescription(templateId),
     category,
     tags: [CATEGORY_LABELS[category] ?? '通用', category],
@@ -285,9 +336,9 @@ export default function InfographicExample({ onBack }) {
           >
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">{activeTemplate.title}</h2>
+                <h2 className="text-lg font-semibold text-slate-900">{activeTemplate.titleZh}</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  已进入放大预览，按 ESC 键或点击遮罩返回。
+                  对应模板：{activeTemplate.title}。已进入放大预览，按 ESC 键或点击遮罩返回。
                 </p>
               </div>
               <button
