@@ -7,42 +7,14 @@ import {
   createMorphInterpolator,
   buildStaticPathD,
 } from "../../lib/svgMorphEngine.js";
+import { morphRows } from "./svgCases.js";
 
 const MORPH_CONFIG = {
   samples: 160,
   duration: 2200,
 };
 
-const BASE_SHAPES = {
-  source:
-    "M 100 18 C 122 24 138 40 150 60 C 168 72 178 92 176 114 C 174 138 158 154 140 166 C 124 178 104 186 84 182 C 62 178 42 164 32 144 C 20 124 18 102 26 82 C 34 60 50 38 72 26 C 82 20 92 16 100 18 Z",
-  target:
-    "M 100 24 L 132 36 L 164 62 L 172 98 L 160 132 L 132 156 L 100 176 L 68 156 L 40 132 L 28 98 L 36 62 L 68 36 Z",
-};
-
-const BASE_COLORS = {
-  source: "#60A5FA",
-  target: "#F97316",
-};
-
-// --- 1. 定义结构化的 Transform 数据 ---
-const TRANSFORM_DATA = {
-  source: { x: -45, y: 6, r: -28, cx: 100, cy: 100, s: 1 },
-  target: { x: 38, y: -8, r: 30, cx: 100, cy: 100, s: 0.8 },
-};
-
-// 辅助：仅用于预览组件生成静态 Transform 字符串 (Logic 复用)
-const getTransformString = ({ x, y, r, cx, cy, s }) =>
-  `translate(${x} ${y}) rotate(${r} ${cx} ${cy}) scale(${s})`;
-
-const TRANSFORMED_META = {
-  label: "带 Transform",
-  sourceTransform: getTransformString(TRANSFORM_DATA.source),
-  targetTransform: getTransformString(TRANSFORM_DATA.target),
-  config: TRANSFORM_DATA,
-};
-
-const SvgPreview = ({ label, path, color, transform }) => (
+const SvgPreview = ({ label, path, color, transform, viewBox, rawSvg }) => (
   <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
     <div className="mb-3 flex items-center justify-between text-xs text-slate-500">
       <span>{label}</span>
@@ -52,13 +24,20 @@ const SvgPreview = ({ label, path, color, transform }) => (
         </span>
       ) : null}
     </div>
-    <svg viewBox="0 0 200 200" className="h-36 w-full">
-      <path d={path} fill={color} stroke={color} transform={transform} />
-    </svg>
+    {rawSvg ? (
+      <div
+        className="h-36 w-full [&_svg]:h-full [&_svg]:w-full"
+        dangerouslySetInnerHTML={{ __html: rawSvg }}
+      />
+    ) : (
+      <svg viewBox={viewBox} className="h-36 w-full">
+        <path d={path} fill={color} stroke={color} transform={transform} />
+      </svg>
+    )}
   </div>
 );
 
-const MorphStage = ({ transformConfig }) => {
+const MorphStage = ({ transformConfig, shapes, colors, viewBox }) => {
   const pathRef = useRef(null);
   const timelineRef = useRef(null);
 
@@ -71,16 +50,16 @@ const MorphStage = ({ transformConfig }) => {
 
   const interpolator = useMemo(
     () =>
-      createMorphInterpolator(BASE_SHAPES.source, BASE_SHAPES.target, {
+      createMorphInterpolator(shapes.source, shapes.target, {
         samples: MORPH_CONFIG.samples,
         optimize: true,
       }),
-    [],
+    [shapes.source, shapes.target],
   );
 
   const colorData = useMemo(
-    () => createColorLerp(BASE_COLORS.source, BASE_COLORS.target),
-    [],
+    () => createColorLerp(colors.source, colors.target),
+    [colors.source, colors.target],
   );
 
   // 注册逻辑：将 Transform 配置传给 Engine
@@ -143,12 +122,12 @@ const MorphStage = ({ transformConfig }) => {
         </button>
       </div>
       <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-        <svg viewBox="0 0 200 200" className="h-48 w-full">
+        <svg viewBox={viewBox} className="h-48 w-full">
           <path
             ref={pathRef}
             // 初始状态由 renderStatic 接管，这里仅设置静态 fallback
-            fill={BASE_COLORS.source}
-            stroke={BASE_COLORS.source}
+            fill={colors.source}
+            stroke={colors.source}
             d={buildStaticPathD(interpolator?.a || [], 1)}
           />
         </svg>
@@ -157,7 +136,7 @@ const MorphStage = ({ transformConfig }) => {
   );
 };
 
-const MorphRow = ({ title, transformMeta }) => {
+const MorphRow = ({ title, transformMeta, shapes, colors, viewBox, sourceSvg, targetSvg }) => {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-4">
@@ -168,20 +147,29 @@ const MorphRow = ({ title, transformMeta }) => {
         <div className="grid gap-4 md:grid-cols-2">
           <SvgPreview
             label="源 SVG 示例"
-            path={BASE_SHAPES.source}
-            color={BASE_COLORS.source}
+            path={shapes.source}
+            color={colors.source}
+            viewBox={viewBox}
             transform={transformMeta?.sourceTransform}
+            rawSvg={sourceSvg}
           />
           <SvgPreview
             label="目标 SVG 示例"
-            path={BASE_SHAPES.target}
-            color={BASE_COLORS.target}
+            path={shapes.target}
+            color={colors.target}
+            viewBox={viewBox}
             transform={transformMeta?.targetTransform}
+            rawSvg={targetSvg}
           />
         </div>
       </div>
       {/* 将数值配置 config 传给 Stage */}
-      <MorphStage transformConfig={transformMeta?.config} />
+      <MorphStage
+        transformConfig={transformMeta?.config}
+        shapes={shapes}
+        colors={colors}
+        viewBox={viewBox}
+      />
     </div>
   );
 };
@@ -216,11 +204,9 @@ export default function BasicMorphTest({ onBack }) {
       </header>
 
       <main className="mx-auto w-full max-w-6xl space-y-10 px-6 py-10">
-        <MorphRow title="基础形态对比" transformMeta={null} />
-        <MorphRow
-          title={TRANSFORMED_META.label}
-          transformMeta={TRANSFORMED_META}
-        />
+        {morphRows.map((row) => (
+          <MorphRow key={row.title} {...row} />
+        ))}
       </main>
     </div>
   );
