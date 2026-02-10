@@ -1,5 +1,5 @@
-import complexSvgSource from "./complex-svg-source.svg?raw";
-import complexSvgTarget from "./complex-svg-target.svg?raw";
+import sequenceTimelineSimpleSvg from "./sequence-timeline-simple.svg?raw";
+import listGridBadgeCardSvg from "./list-grid-badge-card.svg?raw";
 
 const BASE_SHAPES = {
   source:
@@ -25,8 +25,8 @@ const getTransformString = ({ x, y, r, cx, cy, s }) =>
 
 const COMPLEX_CASE = {
   title: "复杂 SVG 对比（Infographic）",
-  sourceSvg: complexSvgSource,
-  targetSvg: complexSvgTarget,
+  sourceSvg: sequenceTimelineSimpleSvg,
+  targetSvg: listGridBadgeCardSvg,
   shapes: {
     source: "M 90 41 L 90 299",
     target:
