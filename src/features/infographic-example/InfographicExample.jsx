@@ -13,6 +13,9 @@ const CATEGORY_LABELS = {
 };
 
 const SEGMENT_LABELS = {
+  tree: '树形',
+  distributed: '分布式',
+  origin: '原点',
   compact: '紧凑',
   plain: '基础',
   simple: '简洁',
@@ -106,7 +109,7 @@ const toChineseTitle = (templateId) => {
   const translatedSegments = templateId
     .split('-')
     .slice(1)
-    .map((segment) => SEGMENT_LABELS[segment] ?? segment.toUpperCase());
+    .map((segment) => SEGMENT_LABELS[segment] ?? segment);
 
   return translatedSegments.length > 0
     ? translatedSegments.join(' · ')
@@ -337,8 +340,11 @@ export default function InfographicExample({ onBack }) {
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">{activeTemplate.titleZh}</h2>
+                <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-400">
+                  {activeTemplate.title}
+                </p>
                 <p className="mt-1 text-sm text-slate-500">
-                  对应模板：{activeTemplate.title}。已进入放大预览，按 ESC 键或点击遮罩返回。
+                  已进入放大预览，按 ESC 键或点击遮罩返回。
                 </p>
               </div>
               <button
