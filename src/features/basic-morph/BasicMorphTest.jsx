@@ -136,7 +136,15 @@ const MorphStage = ({ transformConfig, shapes, colors, viewBox }) => {
   );
 };
 
-const MorphRow = ({ title, transformMeta, shapes, colors, viewBox, sourceSvg, targetSvg }) => {
+const MorphRow = ({
+  title,
+  transformMeta,
+  shapes,
+  colors,
+  viewBox,
+  sourceSvg,
+  targetSvg,
+}) => {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="space-y-4">
