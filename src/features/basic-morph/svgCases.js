@@ -1,5 +1,5 @@
-import sequenceTimelineSimpleSvg from "./sequence-timeline-simple.svg?raw";
-import listGridBadgeCardSvg from "./list-grid-badge-card.svg?raw";
+import sequenceTimelineSimpleSvg from "./svgs/sequence-timeline-simple.svg?raw";
+import listGridBadgeCardSvg from "./svgs/list-grid-badge-card.svg?raw";
 
 const BASE_SHAPES = {
   source:
