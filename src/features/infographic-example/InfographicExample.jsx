@@ -39,6 +39,23 @@ const buildTemplateSpec = (templateId) => {
   };
 };
 
+const getModalRenderSize = (templateId) => {
+  const [category = 'general'] = templateId.split('-');
+  const heightByCategory = {
+    sequence: 460,
+    list: 460,
+    compare: 480,
+    hierarchy: 520,
+    relation: 520,
+    chart: 560
+  };
+
+  return {
+    width: 960,
+    height: heightByCategory[category] ?? 500
+  };
+};
+
 const InfographicCanvas = memo(({ templateId, data, width, height, padding }) => {
   const containerRef = useRef(null);
 
@@ -147,6 +164,11 @@ export default function InfographicExample({ onBack }) {
     [activeTemplateId, templates]
   );
 
+  const activeRenderSize = useMemo(
+    () => (activeTemplate ? getModalRenderSize(activeTemplate.templateId) : null),
+    [activeTemplate]
+  );
+
   useEffect(() => {
     if (!activeTemplate) return undefined;
 
@@ -226,12 +248,12 @@ export default function InfographicExample({ onBack }) {
                 关闭
               </button>
             </div>
-            <div className="h-[75vh] min-h-[480px] rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="max-h-[75vh] overflow-auto rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <InfographicCanvas
                 templateId={activeTemplate.templateId}
                 data={activeTemplate.data}
-                width={960}
-                height={640}
+                width={activeRenderSize?.width ?? 960}
+                height={activeRenderSize?.height ?? 500}
                 padding={18}
               />
             </div>
