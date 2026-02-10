@@ -42,6 +42,9 @@ const buildTemplateSpec = (templateId) => {
 const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
   const containerRef = useRef(null);
 
+  const PREVIEW_WIDTH = 360;
+  const PREVIEW_HEIGHT = 260;
+
   const palette = useMemo(
     () => getPalette('antv') ?? FALLBACK_PALETTE,
     []
@@ -57,8 +60,8 @@ const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
       container,
       template: templateId,
       data,
-      width: 260,
-      height: 200,
+      width: PREVIEW_WIDTH,
+      height: PREVIEW_HEIGHT,
       padding: 10,
       themeConfig: {
         palette
@@ -71,7 +74,7 @@ const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
       infographic.destroy();
       container.innerHTML = '';
     };
-  }, [data, palette, templateId]);
+  }, [PREVIEW_HEIGHT, PREVIEW_WIDTH, data, palette, templateId]);
 
   return (
     <article className="flex h-full flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -95,7 +98,7 @@ const PreviewCard = memo(({ templateId, title, description, tags, data }) => {
         ))}
       </div>
       <div className="flex flex-1 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
-        <div ref={containerRef} className="h-[200px] w-[260px]" />
+        <div ref={containerRef} className="h-[260px] w-[360px] max-w-full" />
       </div>
     </article>
   );
@@ -117,7 +120,7 @@ export default function InfographicExample({ onBack }) {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <header className="border-b border-slate-200 bg-white/90 px-6 py-6 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+        <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4">
           <div className="flex flex-wrap items-center gap-3">
             {onBack ? (
               <button
@@ -140,8 +143,8 @@ export default function InfographicExample({ onBack }) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-6 py-10">
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <main className="mx-auto w-full max-w-[1400px] px-6 py-10">
+        <div className="grid gap-6 lg:grid-cols-2 2xl:grid-cols-3">
           {templates.map((item) => (
             <PreviewCard
               key={item.id}
